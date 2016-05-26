@@ -1,0 +1,38 @@
+<script>
+$(document).ready(function(){
+  sumAll();
+  $(':text').change(sumAll);
+}); //конец функции ready
+</script>
+
+<h2>Редактирование числа вакансий за <%= params[:date] %></h2>
+
+<%  temp_date = params[:date].split('-')
+    year = temp_date[0]
+    month = temp_date[1] %>
+
+<p><a href="/vacancies?mon_select[year]=<%= year %>&mon_select[month]=<%= month %>">вернуться</a></p>
+
+<div class="text-primary, count" id="summ"> </div>
+
+<form action="update" method="PUT" role="form" class="form-horizontal">
+  <% @vacancy.each do |vacancy| %>
+  <div class="form-group">
+      <div class="col-sm-1">
+          <input type="text" class="form-control" name="from_the_form[<%= vacancy.id %>]" value="<%= vacancy.vacancy_count %>">
+      </div>
+      <label class="col-sm-0 control-label"><%= vacancy.dep_name %></label>
+    </div>
+    <% end %>
+    <input type="hidden" name="tek_date" value=<%= params[:date] %>>
+    <div class="form-group">
+      <div class="col-sm-1">
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+      </div>
+    </div>
+</form>
+
+
+
+
+

@@ -1,0 +1,82 @@
+<h2>Просмотр числа вакансий за <%= @tek_date %></h2>
+
+<br>
+<form action="/vacancies" method="GET" role="form" class="form-inline">
+
+    <label>Выберите год:</label>
+    <select name="mon_select[year]" class="form-control" value="">
+      <% @year_list.each do |year| %>
+
+        <% if params[:mon_select] %>
+
+            <% if year == params[:mon_select][:year] %>
+              <option selected><%= year %></option>
+            <% else %>
+              <option><%= year %></option>
+            <% end %>
+
+        <% else %>
+          <option><%= year %></option>
+        <% end %>
+
+      <% end %>
+
+    </select>
+
+    <label>месяц:</label>
+    <select name="mon_select[month]" class="form-control" value="">
+      <% @month_list.each do |month| %>
+
+        <% if params[:mon_select] %>
+
+            <% if month == params[:mon_select][:month] %>
+              <option selected><%= month %></option>
+            <% else %>
+              <option><%= month %></option>
+            <% end %>
+
+        <% else %>
+          <option><%= month %></option>
+        <% end %>
+
+      <% end %>
+    </select>
+  
+    <button type="submit" class="btn btn-primary">Показать</button>
+  
+</form>
+
+<p><br><br>
+<a href="/vacancies/edit?date=<%= @tek_date %>">редактировать</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/employee/index">вернуться</a>
+</p>
+
+<TABLE class="table table-bordered">
+  <THEAD>
+    <TR>
+<!--       <TH>Id</TH> -->
+      <TH>Месяц</TH>
+      <TH>Количество вакансий</TH>
+<!--       <TH>Id отдела</TH> -->
+      <TH>Название отдела</TH>
+    </TR>
+  </THEAD>
+  <TBODY>
+    <% @vacancy.each do |vacancy| %>
+    <TR>
+<!--       <TD><%= vacancy.id %></TD> -->
+      <TD><%= vacancy.month %></TD>
+      <% if vacancy.vacancy_count.to_int != 0 %>
+        <TD bgcolor="#EAF5E5"><%= vacancy.vacancy_count %></TD>
+      <% else %>
+        <TD><%= vacancy.vacancy_count %></TD>
+      <% end %>
+
+<!--       <TD><%= vacancy.department_id %></TD> -->
+      <TD><%= vacancy.dep_name %></TD>
+    </TR>
+    <% end %>
+  </TBODY> 
+</TABLE>
+
+<p><a href="/vacancies/edit?date=<%= @tek_date %>">редактировать</a></p>

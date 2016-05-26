@@ -1,0 +1,129 @@
+$(function () {
+    $('#employee_manage_salary_structure_chart').highcharts({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Структура заработной платы АУП'
+        },
+        xAxis: {
+            categories: JSON.parse('<%= @plotXAxis.to_json.html_safe %>')
+        },
+        yAxis: [{
+            min: 0,
+            title: {
+                text: 'Сумма'
+            },
+            stackLabels: {
+                enabled: false,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            },
+            labels: {
+                formatter: function() {
+                    return thousands_sep(this.value / 1000) +' тыс ₽';
+                }
+            }
+        },{
+            title:{text:'Средняя зарплата'},
+            opposite: true,
+            labels: {
+                formatter: function() {
+                    return thousands_sep(this.value / 1000) +' тыс ₽';
+                }
+            }
+        }
+            ,{
+                title:{text:'Количество персонала'}
+                //opposite: true,
+            }],
+        legend: {
+            align: 'right',
+            x: -100,
+            verticalAlign: 'top',
+            y: 20,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            formatter: function() {
+
+
+                var result = '<b>' + this.x + '</b>';
+                $.each(this.points, function(i, datum) {
+                    result += '<br /> <i style="color:'+datum.series.color+'">' + datum.series.name + '</i>: ' + thousands_sep(datum.y) + datum.series.tooltipOptions.valueSuffix ;
+                    console.log(datum);
+                });
+                console.log(this);
+                //result += '<br /> Всего сотрудников:' + employee_count_infos[this.points[0].point.index]
+
+                return result;
+            },
+            //headerFormat: '<div style="font-size:13px">{point.key}</div>',
+            //pointFormat: '<div><b>{series.name}</b>: ' + '{point.y} человек</div>' ,
+            //footerFormat: '',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal'
+            }
+        },
+        series: [
+            {
+                name: 'Налоги',
+                stack: 'ZP',
+                data: <%= @plotDataManageTax.as_json %>,
+                tooltip: {
+                    valueSuffix: ' ₽'
+                }
+            },{
+                name: 'Премии',
+                stack: 'ZP',
+                data: <%= @plotDataManageBonus.as_json %>,
+                tooltip: {
+                    valueSuffix: ' ₽'
+                }
+            }, {
+                name: 'ЗП',
+                stack: 'ZP',
+                data: <%= @plotDataManageSalary.as_json %>,
+                tooltip: {
+                    valueSuffix: ' ₽'
+                }
+            }
+            , {
+                name: 'Количество АУП',
+                stack: 'none',
+                yAxis: 2,
+                data: <%= @plotDataAUPCount.as_json %>,
+                tooltip: {
+                    valueSuffix: ' чел'
+                },
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black, 0 0 3px black'
+                    }
+                }
+            }
+            ,{
+                name: 'Средняя зарплата',
+                type: 'spline',
+                yAxis: 1,
+                data: <%= @plotDataManageAvg.as_json %>,
+                tooltip: {
+                    valueSuffix: ' ₽'
+                }}                    ]
+    });
+});

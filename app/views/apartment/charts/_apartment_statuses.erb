@@ -1,0 +1,48 @@
+
+
+<div class="tab-pane active" id="statuses">
+  <div class="panel panel-default" style="margin-top: 20px">
+    <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+    <div class="panel-body">
+      <ul>
+        <li>Сколько квартир/м2/млн руб в каждом статусе на текущий момент по всем объектам/по каждому объекту?</li>
+        <li>Сколько квартир/м2/млн руб в каждом статусе было на прошлых неделях по всем объектам/каждому объекту?</li>
+        <li>Сколько 1/2/3-комнатных квартир/м2 в этих квартирах/млн руб в этих квартирах на текущий момент/было на прошлых неделях по всем объектам/каждому объекту?</li>
+      </ul>
+      <!--<i>Примечание: при нажатии на название статуса в панели под графиком будет отображена динамика этого статуса по всем объектам</i>-->
+    </div>
+  </div>
+  <div class="col-sm-12" style="margin-top: 20px">
+      <div class="col-sm-6 ">
+        <div class="btn-group" data-toggle="buttons" id="value_filter_statuses">
+          <label label-default="" id="in-pcs" class="btn btn-default active" data="pcs" data-label="Количество квартир">
+            <input name="options"  type="radio" checked="checked">В квартирах
+          </label>
+          <label label-default=""  id="in-m2" class="btn btn-default" data="m2" data-label="Кв метров">
+            <input name="options"  type="radio">В м<sup>2</sup>
+          </label>
+          <label label-default="" id="in-fin" class="btn btn-default " data="fin" data-label="Рублей">
+            <input name="options"  type="radio">В финанасах
+          </label>
+        </div>
+      </div>
+    <%= render "apartment/charts/commons_part/rooms_filter" %>
+  </div>
+  <div class="row">
+    <div id="apartment-status-chart" class ="chart" style="height: 500px; width: 900px;"></div>
+    <div class="btn-group" style="margin-top: 60px; margin-left: 100px">
+      <button type="button" class="btn btn-default" onclick="showDetailChart(this)" data-status="Свободна">Свободна</button>
+      <button type="button" class="btn btn-default" onclick="showDetailChart(this)" data-status="Имеет заявку">Имеет заявку</button>
+      <button type="button" class="btn btn-default" onclick="showDetailChart(this)" data-status="Аукцион">Аукцион</button>
+      <button type="button" class="btn btn-default" onclick="showDetailChart(this)" data-status="ДКП">Подписан ДКП</button>
+      <button type="button" class="btn btn-default" onclick="showDetailChart(this)" data-status="ПС">Передано ПС</button>
+    </div>
+
+  <div id="container-for-detail-chart" style="display: none">
+    <div id="apartment-status-detail" class="chart" style="height: 500px; width: 900px;"></div>
+  </div>
+  </div>
+  <script type="application/javascript">
+    <%= render "apartment/charts/apartment_status.js" %>
+  </script>
+</div>

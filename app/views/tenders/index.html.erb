@@ -1,0 +1,98 @@
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script type="application/javascript">
+    data = <%= @result.to_json.html_safe %>
+    objsData = <%= @objectTenders.to_json.html_safe %>
+</script>
+
+<%= render "tenders/index2.html" %>
+
+<div class="panel panel-default" style="margin-top: 20px">
+  <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+  <div class="panel-body">
+    <ul>
+      <li>какова сумма всех конкурсов за определенный год?</li>
+      <li>каково среднее снижение стоимости в % за определенный год?</li>
+    </ul>
+  </div>
+</div>
+<div id="prices_chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<!--<div class="panel panel-default" style="margin-top: 20px">-->
+  <!--<div class="panel-heading">Список вопросов, на которые отвечает график</div>-->
+  <!--<div class="panel-body">-->
+    <!--<ul>-->
+      <!--<li>Как изменяется средняя цена за м2 по конкурсным процедурам разного типа по годам?</li>-->
+    <!--</ul>-->
+  <!--</div>-->
+<!--</div>-->
+<!--<div id="m2_chart_type" style="min-width: 310px; height: 400px; margin: 0 auto"></div>-->
+
+<!--<div class="panel panel-default" style="margin-top: 20px">-->
+  <!--<div class="panel-heading">Список вопросов, на которые отвечает график</div>-->
+  <!--<div class="panel-body">-->
+    <!--<ul>-->
+      <!--<li>Какие типы конкурсов какую долю составляют в общем числе?</li>-->
+      <!--<i style="color: red">Графики оставлены для справки. В финальной версии их не будет!!!!! </i>-->
+    <!--</ul>-->
+  <!--</div>-->
+<!--</div>-->
+<!--<div id="types_chart_summ" style="min-width: 310px; height: 500px; display: none"></div>-->
+<!--<div id="types_chart_count" style="min-width: 310px; height: 500px; display: none "></div>-->
+
+<!--<div class="panel panel-default" style="margin-top: 20px">-->
+  <!--<div class="panel-heading">Список вопросов, на которые отвечает график</div>-->
+  <!--<div class="panel-body">-->
+    <!--<ul>-->
+      <!--<li>Сколько конкурсов имеет определенное число поданны и допущенных заявок?</li>-->
+    <!--</ul>-->
+  <!--</div>-->
+<!--</div>-->
+<!--<div id="qty_chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>-->
+
+<div class="panel panel-default" style="margin-top: 20px">
+  <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+  <div class="panel-body">
+    <ul>
+      <li>Сколько конкурсов в определенном году имело имело опреленное число заявок?</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="pull-left">
+    <button type="button" id="qty_count_button" class="btn btn-primary">Число</button>
+    <button type="button" id="qty_sum_button" class="btn  btn-primary btn-danger">Сумма</button>
+  </div>
+  <div class="pull-right">
+    <button type="button" id="qty_percent_button" onclick="changeType('percent')" class="btn btn-primary btn-danger">В процентах</button>
+    <button type="button" id="qty_absolute_button" onclick="changeType('normal')" class="btn btn-primary">В абсолютных значениях</button>
+  </div>
+</div>
+
+<script type="application/javascript">
+    function changeType(type) {
+        for (var i =0; i < qty_chart.series.length; i++){
+            qty_chart.series[i].update({
+                stacking: type
+            }, false);
+        }
+        if (type=='percent'){
+            qty_chart.yAxis[0].setTitle({text: '%'}, false)
+            $("#qty_percent_button").addClass('btn-danger')
+            $("#qty_absolute_button").removeClass('btn-danger')
+        }
+        if (type=='normal')
+        {
+            $("#qty_absolute_button").addClass('btn-danger')
+            $("#qty_percent_button").removeClass('btn-danger')
+            qty_chart.yAxis[0].setTitle({text: ''}, false)
+        }
+
+        qty_chart.redraw();
+    };
+</script>
+<div id="qty_chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script type="application/javascript">
+    <%= render "tenders/tenders_scripts.js" %>
+</script>

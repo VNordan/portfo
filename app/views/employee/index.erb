@@ -1,0 +1,32 @@
+<div class="col-sm-6">
+  <a href="/vacancies" class="btn btn-default btn-lg btn-block">Число вакансий</a>
+</div>
+<div class="col-sm-6">
+  <a href="/employee/editmanagment" class="btn btn-default btn-lg btn-block">Выбор управляющих подразделений</a>
+</div>
+
+<script type="application/javascript">
+//    console.log (333)
+//    $.ajax({
+//        url: "/api/getchart",
+//        dataType : 'html',
+//        success: function( msg ) {
+//            eval(msg)
+//        }
+//    })
+</script>
+
+<script type="application/javascript">
+    <%= render 'employee/charts/employee_common_scripts.js'%>
+</script>
+<div class="col-md-12">
+  <%= render 'employee/charts/employee_salary_structure_chart'%>
+  <%= render 'employee/charts/employee_situation_chart'%>
+  <%= render 'employee/charts/employee_koef_chart'%>
+  <%= render 'employee/charts/employee_type_personal'%>
+  <%= render 'employee/charts/employee_manage_salary_structure_chart'%>
+  <%= render 'employee/charts/employee_departments_employees_situation'%>
+</div>
+
+<script src="http://code.highcharts.com/highcharts.js"></script>
+

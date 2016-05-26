@@ -1,0 +1,131 @@
+<div class="tab-pane" id="addprice">
+  <div class="panel panel-default" style="margin-top: 20px">
+    <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+    <div class="panel-body">
+      <ul>
+        <li>На сколько больше финансов удалось получить за счет проведения аукциона на этой/прошлых неделях по всем объектам/по каждому объекту?</li>
+      </ul>
+      <!--<i>Примечание: так как данные случайны, то фильтры не будут приводить к изменению графика</i>-->
+    </div>
+  </div>
+  <div class="col-sm-12" style="margin-top: 20px">
+    <%= render "apartment/charts/commons_part/rooms_filter" %>
+  </div>
+  <div class="row">
+    <div id="apartment-add-price" class ="chart" style="height: 500px; width: 900px;"></div>
+  </div>
+  <script type="application/javascript">
+      $(function () {
+       apartment_add_price = new Highcharts.Chart({
+              credits:  {
+                  enabled: false
+              },
+              chart: {
+                  type: 'column',
+                  renderTo:'apartment-add-price'
+              },
+              title: {
+                  text: 'Повышение стоимости квартир на торгах'
+              },
+              xAxis: {
+                  categories: getWeeksCategories()
+              },
+              yAxis: {
+                  title: {
+                      text: ''
+                  },
+                  labels: {
+                      formatter: function() {
+                          return this.value / 1000000 + ' млн ₽';
+                      }
+                  },
+                  stackLabels: {
+                      enabled: true,
+                      style: {
+                          fontWeight: 'bold',
+                          color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                      }
+                  }
+              },
+              tooltip: {
+                  formatter: function() {
+                      var result = '<b>' + this.x + '</b>';
+                      $.each(this.points, function(i, datum) {
+
+                              result += '<br /> <i style="color: '+datum.point.series.color+'">'
+                                      + datum.series.name + '</i>: '
+                                      + thousands_sep((datum.y/1000000).toFixed(3)) + ' млн ₽ ';
+
+                      });
+                      return result;
+                  },
+                  shared: true,
+                  useHTML: true
+              },
+              plotOptions: {
+                  column: {
+                      //stacking: 'normal',
+                      dataLabels: {
+                          enabled: true,
+                          color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                          style: {
+                              textShadow: '0 0 3px black, 0 0 3px black'
+                          },
+                          formatter: function() {return thousands_sep((this.y/1000000).toFixed(3))}
+                      }
+                  }
+              },
+              series: [
+                  {name: 'Добавочная стоимость',data: []},
+                  {name: 'Начальная стоимость',data: []}
+              ]
+          });
+
+
+
+
+      redrawAddPriceChart = function(){
+          weeks_group = []
+
+          $.each(filtered_apartments, function(i,val){
+
+              apart_date = moment(val.dkp_date)
+
+              $.each(getWeeksStarts(), function(t,week){
+                  if(weeks_group[t]==null) weeks_group[t]=[]
+                  if (apart_date.diff(week, 'days')>=0 && apart_date.diff(week, 'days')<7)
+                  {
+                      weeks_group[t].push(val)
+                  }
+              })
+          })
+
+          series =  [
+              {name: 'Добавочная стоимость',data: [0,0,0,0,0]},
+              {name: 'Начальная стоимость',data: [0,0,0,0,0]}
+          ];
+
+          $.each(weeks_group, function(gi, week_data){
+              $.each(week_data, function(i,val){
+                  series[1]['data'][gi]+=parseFloat((val.sum))
+                  series[0]['data'][gi]+=parseFloat((val.end_sum))
+              })
+          })
+
+          series[0]['data'][1]= parseFloat((series[0]['data'][1]).toFixed(3))
+          series[1]['data'][1]= parseFloat((series[1]['data'][1]).toFixed(3))
+
+          var t=0;
+          $.each (series, function (i,ser){
+              apartment_add_price.series[i].setData(ser.data, false);
+          })
+          apartment_add_price.redraw();
+
+      }
+
+      redrawAddPriceChart();
+
+
+      });
+  </script>
+</div>

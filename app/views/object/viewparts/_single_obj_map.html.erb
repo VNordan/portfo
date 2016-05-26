@@ -1,0 +1,23 @@
+<script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+<div id="map" style="width: 350px; height: 350px"></div>
+
+<!--<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>-->
+	<script>
+
+        var map, marker;
+        init_map = function (){
+          map = new ymaps.Map("map", {
+              center: [<%= @object.lat %>, <%= @object.lng %> ],
+              zoom: 13,
+              controls: ['smallMapDefaultSet']
+          });
+          map.controls.remove('fullscreenControl');
+          map.controls.remove('geolocationControl');
+          map.controls.remove('searchControl');
+          map.controls.remove('typeSelector');
+          marker = new ymaps.Placemark([<%= @object.lat %>, <%= @object.lng %> ]);
+          map.geoObjects.add(marker);
+        };
+        ymaps.ready(init_map);
+
+	</script>

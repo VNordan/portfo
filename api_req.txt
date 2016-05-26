@@ -1,0 +1,201 @@
+--- Объекты (objects) ---
+    - Типы объектов (для фильтра) (objectType)
+        Поля:
+            - id (int) уникальный ключ у вас в базе
+            - parent_id (int) у нижнего (объекты) parent_id должен быть равен 0, соотв. у "жилище", "социальные объекты", "прочее" дочерние и у них parent_id != 0
+            - name (string)
+
+    - Регионы (objectRegion)
+        Поля: id (int), name (string) //{id: 1, name: 'ЮВАО'}
+
+    - Объекты (может дорабатываться) (objects)
+        Поля:
+            - id (int)
+            - region_id (int) 
+            - type_id (int)
+            - plan_id (int) (1 = индивидуальное, 2 = серийное)
+            - address (string)
+            - is_archive (int)
+            - date (timestamp) (дата ввода в эксплуатацию)
+            - latitude (float)
+            - longitude (float)
+            - power (float) (количество кв. м. и тд)
+            - power_unit_name (string) (единица измерения для поля power)
+            - without_date (int) (Нет в АИП = 1 || 0)
+            - video_url (string) (ссылка на стрим)
+
+    - Банковская гарантия (bankGuarantee)
+        Поля: id (int), object_id (int), expected_receive_date (timestamp), real_receive_date (timestamp)
+
+    - Снос здания (buildingDemolition)
+        Поля: id (int), object_id (int), expected_receive_date (timestamp), real_receive_date (timestamp)
+
+    - Работы по объекту (works)
+        Поля:
+            - id (int)
+            - object_id (int)
+            - price (int)
+            - type (int) (тип работ, 1 = СМР)
+            - payment_type (int) (1 = обычных платеж, 2 = в счет авансов)
+            - payed (int) сколько выплачено
+
+    - Работы по объекту (objectWorkPayment)
+        Поля:
+            - object_id (int)
+            - prepay_payed (int)
+            - prepay_not_payed (int)
+            - normal_payed (int)
+            - left_to_pay (int)
+
+    - Выполненность работ (objectPerformance)
+        Поля:
+            - id (int) (один и тот же)
+            - payed (int)
+            - left (int)
+
+    - Строительно Монтажные Работы (objectMontageWorks)
+        Поля:
+            - id (int)
+            - object_id (int)
+            - contract_name (string)
+            - prepay_payed (int)
+            - prepay_not_payed (int)
+            - normal_payed (int)
+            - left_to_pay (int)
+            - payed (int)
+            - left (int)
+
+    - Освоение бюджета (objectBudget)
+        Поля:
+            - id (int)
+            - object_id (int)
+            - budjet (int)
+            - budjet_spent (int)
+            - date (timestamp)
+
+    - Затраты по объекту (payment)
+        Поля:
+            - id (int)
+            - object_id (int)
+            - count (int) (Потраченная сумма)
+            - date (int)
+
+    - Имена параметров объекта (ТЭПы) (optionName)
+        Поля:
+            - id (int)
+            - name (string)
+
+    - Значения параметров объекта (ТЭПы) (Важно: если есть несколько значений на один ТЭП - то это несколько записей) (optionValue)
+        Поля:
+            - id (int)
+            - object_id (int)
+            - option_id (int) (см. выше)
+            - value (string)
+
+    - Документы по объекту (значения) (objectDocument)
+        Поля:
+            - id (int)
+            - object_id (int)
+            - type_id (int) (тип документа, ГПЗУ = 1, МГЭ = 2, разрешение на строительство = 3, остальное не важно)
+            - expected_receive_date (timestamp) (ожидаемая дата получения документа)
+            - real_receive_date (timestamp) (реальная дата получения)
+
+    - Названия документов (objectDocumentName)
+        Поля:
+            - id (int) (ГПЗУ = 1, МГЭ = 2, разрешение на строительство = 3, остальное не важно)
+            - name (string)
+
+    - Категории объектов (таблица связи типов объектов с категориями (нужно для страницы "график производства")) (objectDocumentCategory)
+        Поля:
+            - type_id (int) (указатель на тип объекта)
+            - category_id (int)
+
+    - Имена категорий объектов (objectDocumentCategoryName)
+        Поля:
+            - id (int)
+            - name (string)
+
+    - Ключевые производственные даты (выход подрядчика на строй площадку, сети, отделка и тд.) (objectProductionDate)
+        Поля:
+            - date_id (int)
+            - object_id (int)
+            - date (timestamp)
+
+    - Названия ключевых производственных дат (objectProductionDateName)
+        Поля:
+            - id (int)
+            - name (string)
+
+    - Дополнительные требования (отселение и снос) (objectAdditionalRequirement)
+        Поля:
+            - requirement_id (int)
+            - object_id (int)
+            - value (string)
+
+    - Названия дополнительных требований (objectAdditionalRequirementName)
+        Поля:
+            - id (int)
+            - name (string)
+
+    - Инженерные работы по объекту (перекладка инж. коммуникаций, электроснабжение и т.д.) (objectEngineeringWork)
+        Поля:
+            - work_id (int)
+            - object_id (int)
+            - value (string)
+
+    - Названия инженерных работ по объекту (objectEngineeringWorkName)
+        Поля:
+            - id (int)
+            - name (string)
+
+    - Связи инженерных работ с категориями инженерных работ (objectEngineeringWorkCategory)
+        Поля:
+            - work_id (int)
+            - category_id (int)
+
+    - Названия категорий инженерных работ (objectEngineeringWorkCategoryName)
+        Поля:
+            - id (int)
+            - name (string)
+
+    - Информация с объездов, проценты по работам (objectWorkPerformance)
+        Поля:
+            - work_id (int)
+            - object_id (int)
+            - percent (int)
+
+    - Названия работ с объездов (objectWorkPerformanceName)
+        Поля:
+            - id (int)
+            - parent_id (int) (у родительской категории id = 0)
+            - name (string)
+
+    - Даты объездов объектов (objectVisitDate)
+        Поля:
+            - object_id (int)
+            - date (timestamp)
+
+    - Аукционы (auction)
+        Поля:
+            - object_id (int)
+            - contractor_id (int) (id подрядчика)
+            - type_id (int)
+            - status (int) (1 = Объявлен, 2 = Окончен, 3 = Идет)
+            - date_start (timestamp)
+            - date_finish (timestamp)
+            - price_start (int)
+            - price_finish (int)
+            - request_filed_count (int) (Количество поданных заявок)
+            - request_accepted_count (int) (Количество одобренных заявок)
+
+    - Типы аукционов (auctionType)
+        Поля:
+            - id (int) (2 = Генподрядчик, 7 = Управляющая компания)
+            - name (string)
+
+    - Фото объекта (objectPhoto)
+        Поля:
+            - object_id (int)
+            - preview_url (string)
+            - full_image_url (string)
+            - date (timestamp)

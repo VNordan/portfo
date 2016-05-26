@@ -1,0 +1,562 @@
+<div class="panel panel-default">
+  <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+  <div class="panel-body">
+    <ul>
+      <li>Сколько объектов определенного года ввода, назначения и округа имеют документ?</li>
+      <li>Сколько объектов определенного года ввода, назначения и округа не имеют документ и сколько просрочили его получение?</li>
+      <li>Какие объекты просрочили получение документа и кто ответсвенный за эти объекты?</li>
+    </ul>
+    <!--<i style="color: red">Данные реальные</i>-->
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12" >
+    <ul class="nav nav-pills" id="documents" style=" float: left; margin-left: 200px;">
+      <li id="GPZU" class="active" data-title="ГПЗУ"><a href="#">ГПЗУ</a></li>
+      <li id="MGE" data-title="Наличие экспертизы"><a href="#">Экспертиза</a></li>
+      <li id="razresh" data-title="Наличие разрешения"><a href="#">Разрешение</a></li>
+      <li id="bank_garant" data-title="Погашение БГ"><a href="#">Банковкая гарантия</a></li>
+      <li id="destroy" data-title="Выполнение сноса"><a href="#">Снос</a></li>
+    </ul>
+    <button type="button" class="btn btn-danger" style="float: left; margin-top: 3px; margin-left: 35px;" id="overdue_link">Список просроченных</button>
+  </div>
+  <div class="col-sm-2" style="padding-top: 20px">
+    <div class="btn-group-vertical">
+      <div class="btn btn-default parent_appointment selected" data-childs="['жилье', 'инженерия']">
+        <div style="text-align: left;">Жилище</div>
+        <div class="btn-group-vertical childs-appointment">
+          <button type="button" class="btn btn-default child-appointment selected">жилье</button>
+          <button type="button" class="btn btn-default child-appointment selected">инженерия</button>
+        </div>
+      </div>
+      <div class="btn btn-default parent_appointment selected" data-childs="['БНК', 'ДОУ', 'Спорт - ФОК', 'ФОК' ,'школа' ]">
+        <div style="text-align: left;">Образование</div>
+        <div class="btn-group-vertical childs-appointment">
+          <button type="button" class="btn btn-default child-appointment selected">БНК</button>
+          <button type="button" class="btn btn-default child-appointment selected">ДОУ</button>
+          <button type="button" class="btn btn-default child-appointment selected">Спорт - ФОК</button>
+          <button type="button" class="btn btn-default child-appointment selected">ФОК</button>
+          <button type="button" class="btn btn-default child-appointment selected">школа</button>
+        </div>
+      </div>
+      <div class="btn btn-default parent_appointment selected" data-childs="['Поликлиника']">
+        <div style="text-align: left;">Здравоохранение</div>
+        <div class="btn-group-vertical childs-appointment">
+          <button type="button" class="btn btn-default child-appointment selected">Поликлиника</button>
+        </div>
+      </div>
+      <div class="btn btn-default parent_appointment selected" data-childs="['Прочие объекты', 'переход', 'Дороги']">
+        <div style="text-align: left;">Прочее</div>
+        <div class="btn-group-vertical childs-appointment">
+          <button type="button" class="btn btn-default child-appointment selected">Дороги</button>
+          <button type="button" class="btn btn-default child-appointment selected">переход</button>
+          <button type="button" class="btn btn-default child-appointment selected">Прочие объекты</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-sm-8">
+    <div class="col-sm-12">
+      <div style="width: 730px; height: 500px" id="chart"></div>
+    </div>
+    <div class="col-sm-12" id="table_div">
+
+    </div>
+  </div>
+  <div class="col-sm-2" id="okrug_filter">
+    <div class="btn btn-default selected" onclick="selectAllOkrug()">
+      <div style="text-align: left;">Все округа</div>
+      <div class="btn-group-vertical">
+        <% @districts.each do |d| %>
+            <button type="button" class="btn btn-default okrug selected"><%= d.region||"---"  %></button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-3" style="margin-bottom: 20px">
+    <div class="btn-group filter" data-toggle="buttons" id="year_filter" >
+      <% @years.each do |y| %>
+          <label class="btn btn-primary active" id="<%= y  %>">
+            <input type="checkbox"><%= y %>
+          </label>
+      <% end %>
+    </div>
+  </div>
+</div>
+<div class="row" id="overdue_table_row" style="display: none">
+  <table class="table table-condensed">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Адрес</th>
+      <th>Плановая дата получения</th>
+      <th>Менеджер</th>
+    </tr>
+    </thead>
+    <tbody id="overdue_table_body">
+
+    </tbody>
+  </table>
+</div>
+
+
+<script type="application/javascript">
+
+    selectAllOkrug = function (){
+        $.each($('.okrug'), function(i,val){
+            $(val).addClass('selected');
+        })
+        redrawCharts();
+    }
+
+    getCurrentDocument = function (){
+        return $('#documents > li.active').attr('id');
+    }
+
+
+    getYearsFilter = function(){
+        var res = [];
+        $.each($("#year_filter label.active"), function() {
+            res.push($(this).attr('id'))
+        })
+        return res;
+    }
+
+    getOkrugFilter = function () {
+        var res = Array();
+        $.each($(".okrug.selected"), function(i , val){
+            res.push($(val).text())
+        })
+
+        console.log(res);
+        return res;
+    }
+
+    getAppointmentFilter = function (){
+        var res = [];
+        $.each($(".child-appointment.selected"), function() {
+            res.push($(this).text())
+        })
+        console.log(res)
+        return res;
+    }
+
+    appointment_group_select = function(){
+        //console.log($("#appointment_filter label.active"));
+        $.each($("#appointment_filter label"), function() {
+            $(this).removeClass('active');
+        })
+        setTimeout(function() {
+            $.each($("#appointment_filter_top label.active"), function() {
+                arr = eval($(this).attr('data-childs'))
+                $.each(arr, function(i, val){
+                    $("label[id='"+val+"'").addClass('active')
+                })
+            })
+            redrawCharts();
+        }, 100)
+
+
+    }
+
+    showOverdueObjects = function(){
+        var document = getCurrentDocument();
+        var overdues_objects = [];
+        $.each(filteredObjects, function(i,val){
+           if (val[document]=='Просрочено')
+            overdues_objects.push(val);
+        });
+        bindOverdueObjects(document, overdues_objects.sort(compareOverdueObjects));
+        $("#overdue_table_row").show('slow');
+        scrollToAnchor('overdue_table_body');
+        console.log(overdues_objects);
+    }
+
+    compareOverdueObjects = function(a, b){
+        var doc = getCurrentDocument();
+        var one = moment(a.plansDates[doc], "DD.MM.YYYY")
+        var two = moment(b.plansDates[doc], "DD.MM.YYYY")
+        if (one.diff(two)<0)
+            return -1;
+        if (one.diff(two)>0)
+            return 1;
+        return 0;
+    }
+
+    function scrollToAnchor(id){
+        var aTag = $("#"+ id);
+        console.log(aTag);
+        $('html,body').animate({scrollTop: aTag.offset().top},'slow');
+    }
+
+    bindOverdueObjects = function(doc, objs){
+        var overdueTable = document.getElementById('overdue_table_body');
+        $(overdueTable).html('');
+        $.each(objs, function(i, val){
+            var row = document.createElement('tr');
+            $(row).addClass('danger');
+            row.innerHTML = "<td>"+(i+1)+"</td>"+
+                            "<td><a href='view?id="+val.id+"'>"+val.adress+"</a></td>"+
+                            "<td>"+val.plansDates[doc]+"</td>"+
+                            "<td>"+val.manager+"</td>";
+            overdueTable.appendChild(row);
+        });
+    }
+    appointment_select = function(){
+
+        event.cancelBubble = true;
+        //add_class
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+        parent = $(this).parent()
+
+        var all = true;
+        $.each (parent.children('button'), function(i,val){
+          if (!$(val).hasClass('selected')){
+              all = false;
+          }
+        })
+        if (all)
+            $(this).parent().parent().addClass('selected');
+        else
+            $(this).parent().parent().removeClass('selected');
+
+        redrawCharts();
+    }
+
+    parent_appointment_select = function(){
+        //add_class
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+        var all = true;
+        buttons = $(this).children('.childs-appointment').children('button')
+        $.each (buttons, function(i,val){
+            if (!$(val).hasClass('selected')){
+                all = false;
+            }
+            console.log(val, all)
+        })
+
+        if (all){
+            $.each (buttons, function(i,val){
+                console.log("delete")
+                $(val).removeClass('selected')
+            })
+        }
+        else
+            $.each (buttons, function(i,val){
+                console.log("add")
+                $(val).addClass('selected')
+            })
+        redrawCharts();
+    }
+
+    okrug_select = function(){
+        event.cancelBubble = true;
+        //add_class
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+        redrawCharts();
+    }
+
+    $(function(){
+        //навешиваем обработчики
+        $("#all-okrugs").on('click', selectAllOkrug);
+        $("#okrug_filter input").change(redrawCharts);
+        $("#year_filter label").change(redrawCharts);
+        $("#documents li a").click(changeDocument);
+        $("#appointment_filter label").change(redrawCharts);
+        $("#appointment_filter_top label").change(appointment_group_select);
+        $('.child-appointment').click(appointment_select);
+        $('.parent_appointment').click(parent_appointment_select);
+        $('.okrug').click(okrug_select);
+        $("#overdue_link").click(showOverdueObjects);
+        createDocumentChart();
+        createFinChart();
+        createWorkChart();
+        redrawCharts();
+    });
+
+    changeDocument = function (){
+        $("#documents li.active").removeClass('active');
+        $(this).parent().addClass('active');
+        $("#overdue_table_row").hide();
+        redrawDocumentChart();
+    }
+
+    redrawCharts = function () {
+        //add some delay for addClass complete
+        setTimeout(function() {
+//          console.log(getYearsFilter(), getOkrugFilter())
+            $("#overdue_table_row").hide();
+            filterObjects();
+            redrawDocumentChart();
+            redrawFinanceChart();
+            redrawWorkChart();
+            if (myMap != undefined)
+            {
+                filter_map_points();
+                rebind_markers();
+            }
+        }, 100)
+    }
+
+    redrawDocumentChart = function(){
+        var filteredObjects = window.filteredObjects;
+        var currentDocument = getCurrentDocument()
+        var data = {};
+        $.each(filteredObjects, function(i,obj){
+            data[obj[currentDocument]] = (data[obj[currentDocument]] || 0) + 1
+        });
+        changeChartParams(data,currentDocument);
+    }
+
+    redrawFinanceChart = function () {
+        //add some delay for addClass complete
+        setTimeout(function() {
+            var filteredObjects = window.filteredObjects;
+            var data = [
+                ['Оплачено не в счет авансов',   0],
+                ['Авансов выдано и погашено',       0],
+                ['Авансов выдано и непогашено',   0],
+                ['Остаток оплаты',   0]
+            ];
+            $.each(filteredObjects, function(i,obj){
+                data[0][1]+=obj.payed
+                data[1][1]+=obj.avans_pogasheno
+                data[2][1]+=obj.avans_ne_pogasheno
+                data[3][1]+=obj.payed_left
+            });
+            fin_chart.series[0].setData(data, true);
+        }, 100)
+
+    }
+
+    redrawWorkChart = function () {
+        //add some delay for addClass complete
+        setTimeout(function() {
+            var filteredObjects = window.filteredObjects;
+            var data = [
+                ['Выполнено',   0],
+                ['Остаток выполнения',   0]
+                //['Выполнено в счет аванса',       0],
+            ];
+            $.each(filteredObjects, function(i,obj){
+                data[0][1]+=obj.work_complete
+                //data[1][1]+=obj.avans_pogasheno
+                data[1][1]+=obj.work_left
+            });
+            work_chart.series[0].setData(data, true);
+        }, 100)
+
+    }
+
+    changeChartParams = function (data, currentDocument){
+
+        var series = []
+        var summ = 0;
+        for (variable in data) {
+            series.push([variable, data[variable]])
+            summ += data[variable];
+        }
+        chart.series[0].setData(series, true);
+        allTitle.attr({
+            text: summ
+        });
+        chart.setTitle({ text:  $("#"+currentDocument).attr('data-title') })
+    }
+
+
+    createFinChart = function(){
+        // Build the chart
+        fin_chart = new Highcharts.Chart({
+            credits:  {
+                enabled: false
+            },
+            chart: {
+                renderTo:'fin_chart',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: 'Оплаты'
+            },
+            tooltip: {
+                formatter: function () {
+                    var s ="";
+                    $.each(this.series.points, function (i, point) {
+                        s += "<b>"+point.name + '</b> ' + thousands_sep((point.y/1000000).toFixed(0)) + ' млн ₽ <br/>';
+                    });
+                    return s;
+                },
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                pie: {
+                    center: ['50%', '50%'],
+                    showInLegend: true
+                }
+
+            },
+            series: [{
+                type: 'pie',
+                name: 'Сумма',
+                innerSize: '50%',
+                data: [
+                    ['Не оплачено',   0],
+                    ['Выполнено и оплачено',       0],
+                    ['Оплачено, но не выполнено',    0]
+
+                ]
+            }]
+        });
+    }
+
+    createWorkChart = function(){
+        // Build the chart
+        work_chart = new Highcharts.Chart({
+            credits:  {
+                enabled: false
+            },
+            chart: {
+                renderTo:'work_chart',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: 'Выполнение работ'
+            },
+            tooltip: {
+                formatter: function () {
+                    var s ="";
+                    $.each(this.series.points, function (i, point) {
+                        s += "<b>"+point.name + '</b> ' + thousands_sep((point.y/1000000).toFixed(0)) + ' млн ₽ <br/>';
+                    });
+                    return s;
+                },
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                pie: {
+                    center: ['50%', '50%'],
+                    showInLegend: true
+                }
+
+            },
+            series: [{
+                type: 'pie',
+                name: 'Сумма',
+                innerSize: '50%',
+                data: [
+                    ['Не оплачено',   0],
+                    ['Выполнено и оплачено',       0],
+                    ['Оплачено, но не выполнено',    0]
+
+                ]
+            }]
+        });
+    }
+
+
+    filterObjects = function ()
+    {
+        //var res = []
+        var years = getYearsFilter();
+        var okrugs = getOkrugFilter();
+        var appointments = getAppointmentFilter();
+
+        objects = data['objects'];
+        window.filteredObjects.length=0;
+        $.each(objects, function(i, obj){
+            if ($.inArray( obj.year, years )!=-1 &&
+                    $.inArray(obj.okrug, okrugs)!= -1 &&
+                    $.inArray(obj.appointment, appointments) != -1)
+            {
+                window.filteredObjects.push(obj);
+            }
+        })
+    }
+
+    createDocumentChart = function(){
+        chart = new Highcharts.Chart({
+            credits:  {
+                enabled: false
+            },
+            chart: {
+                renderTo: 'chart',
+                plotBackgroundColor: null,
+                plotBorderWidth: 0,
+                plotShadow: true
+            },
+            title: {
+                text: 'Наличие ГПЗУ'
+            },
+            tooltip: {
+                formatter: function () {
+//                    var s = this.series.name +" "+  this.point.name+"<br>";
+                    var s ="";
+                    $.each(this.series.points, function (i, point) {
+                        s += "<b>"+point.name + '</b> ' + point.y + ' объектов <br/>';
+                    });
+
+                    //s += '<a href="/object/overdue?okrugs=['+getOkrugFilter()+']">Список просроченных объектов</a>'
+
+                    return s;
+
+                },
+                shared: true,
+                useHTML: true
+//                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            plotOptions: {
+                pie: {
+                    center: ['50%', '50%']
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Статус получения: ',
+                innerSize: '50%',
+                data: [
+                    ['С ГПЗУ',   0],
+                    ['БЕЗ ГПЗУ',  0],
+                    ['ПРОСРОЧЕНО', 0]
+
+                ]
+            }]
+        });
+        allTitle = chart.renderer.text('0', 320, 280)
+                .css({
+                    color: "black",
+                    "font-size" : "40pt"
+                })
+                .add();
+    }
+    data = <%= @data.to_json.html_safe %>
+
+    filteredObjects = [];
+
+    $.each(data['objects'], function(i, val){
+        window.filteredObjects.push(val);
+    })
+</script>

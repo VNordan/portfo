@@ -1,0 +1,26 @@
+<h2>Просмотр числа вакансий за <%= @t.prev_year(2) %></h2>
+<p><a href="/employee/vacancies_ed" class="btn btn-primary btn-sm">редактировать</a></p>
+
+
+<TABLE class="table table-bordered">
+  <THEAD>
+    <TR>
+<!--       <TH>Id</TH> -->
+      <TH>Месяц</TH>
+      <TH>Количество вакансий</TH>
+<!--       <TH>Id отдела</TH> -->
+      <TH>Название отдела</TH>
+    </TR>
+  </THEAD>
+  <TBODY>
+    <% @vacancy.each do |vacancy| %>
+    <TR>
+<!--       <TD><%= vacancy.id %></TD> -->
+      <TD><%= vacancy.month %></TD>
+      <TD><%= vacancy.vacancy_count %></TD>
+<!--       <TD><%= vacancy.department_id %></TD> -->
+      <TD><%= vacancy.dep_name %></TD>
+    </TR>
+    <% end %>
+  </TBODY> 
+</TABLE>

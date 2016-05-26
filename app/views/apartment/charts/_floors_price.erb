@@ -1,0 +1,186 @@
+<div class="tab-pane" id="floorprice">
+  <div class="panel panel-default" style="margin-top: 20px">
+    <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+    <div class="panel-body">
+      <ul>
+        <li>Как зависит средняя/минимальная/максимальная оценочная стоимость от этажа по всем объектам/по каждому объекту с учетом комнатности/без нее?</li>
+        <li>Как зависит средняя/минимальная/максимальная итоговая стоимость от этажа по всем объектам/по каждому объекту с учетом комнатности/без нее?</li>
+      </ul>
+
+    </div>
+  </div>
+  <div class="col-sm-12" style="margin-top: 20px">
+    <%= render "apartment/charts/commons_part/rooms_filter" %>
+  </div>
+  <div class="row">
+    <div id="apartment-floor-price" class ="chart" style="height: 500px; width: 900px;"></div>
+  </div>
+  <script type="application/javascript">
+      $(function () {
+
+          floorPriceChart = new Highcharts.Chart({
+              credits:  {
+                  enabled: false
+              },
+              title: {
+                  text: 'Стоимость м2 от этажа'
+              },
+              chart: {
+                  //type: 'column',
+                  renderTo:'apartment-floor-price'
+              },
+              xAxis: {
+                  min: 1,
+                  max: 20,
+                  allowDecimals: false,
+                  tickInterval: 1
+//                  type: 'datetime'
+              },
+
+              yAxis: {
+                  title: {
+                      text: 'Стоимость квадратного метра'
+                  },
+                  labels: {
+                      formatter: function () {
+                          return this.value/1000 + ' тыс ₽';
+                      }
+                  }
+              },
+              xAxis: {
+                  tickmarkPlacement: 'on',
+                  title: {
+                      text: 'Этаж'
+                      //align: 'center'
+                  }
+              },
+              tooltip: {
+                  formatter: function() {
+                      var result = '<b>' + this.x + '</b>';
+                      $.each(this.points, function(i, datum) {
+                          if (i%2==0)
+                              result += '<br /> <i style="color: '+datum.point.series.color+'">'
+                                      + datum.series.name + '</i>: '
+                                      + thousands_sep(datum.y.toFixed(0)) + ' ₽ ';
+                          else
+                              result += '<br /> <i style="color: '+datum.point.series.color+'">'
+                                      + datum.series.name + '</i>: '
+                                      + thousands_sep(datum.point.low.toFixed(0)) + ' - '
+                                      + thousands_sep(datum.point.high.toFixed(0)) + ' ₽ ';
+                      });
+                      return result;
+                  },
+                  shared: true,
+                  useHTML: true
+              },
+
+              legend: {
+              },
+
+              series: [{
+                  name: 'Оценочная',
+                  data: [],
+                  zIndex: 1,
+                  marker: {
+                      fillColor: 'white',
+                      lineWidth: 2,
+                      lineColor: Highcharts.getOptions().colors[0]
+                  }
+              }, {
+                  name: 'Корридор оценочной цены',
+                  data: [],
+                  type: 'arearange',
+                  lineWidth: 0,
+                  linkedTo: ':previous',
+                  color: Highcharts.getOptions().colors[0],
+                  fillOpacity: 0.3,
+                  zIndex: 0
+              },{
+                  name: 'Итоговая',
+                  data: [],
+                  zIndex: 1,
+                  marker: {
+                      fillColor: 'white',
+                      lineWidth: 2,
+                      lineColor: Highcharts.getOptions().colors[1]
+                  }
+              }, {
+                  name: 'Корридор итоговой цены',
+                  data: [],
+                  type: 'arearange',
+                  lineWidth: 0,
+                  linkedTo: ':previous',
+                  color: Highcharts.getOptions().colors[1],
+                  fillOpacity: 0.3,
+                  zIndex: 0
+              }]
+
+          });
+
+          redrawFloorPriceChart = function(){
+              var data =  getDataForFloorPriceChart();
+              console.log(data.range_start)
+              floorPriceChart.xAxis[0].setCategories(data.cat,false)
+              floorPriceChart.series[0].setData(data.avgs_start,false)
+              floorPriceChart.series[2].setData(data.avgs_end, false)
+              floorPriceChart.series[1].setData(data.range_start, false)
+              floorPriceChart.series[3].setData(data.range_end, false)
+
+              floorPriceChart.redraw();
+          }
+
+          getDataForFloorPriceChart = function (){
+              var floors = []
+              var data_avg = {first_price:[],end_price:[], count:[]};
+              var data_range = {first_price:[],end_price:[]};
+
+              $.each(filtered_apartments, function(i, val){
+                  if (val.dkp_date==null) return;
+
+                  var floor = val['floor']
+                  if (floors.indexOf(floor)==-1) floors.push(floor);
+                  if (data_range.first_price[floor]==null) data_range.first_price[floor] = [10000000, 0]
+                  if(data_range.first_price[floor][0]>val.price_m2_start) data_range.first_price[floor][0]=val.price_m2_start
+                  if(data_range.first_price[floor][1]<val.price_m2_start) data_range.first_price[floor][1]=val.price_m2_start
+
+                  if (data_range.end_price[floor]==null) data_range.end_price[floor] = [10000000, 0];
+                  if(data_range.end_price[floor][0]>val.price_m2_end) data_range.end_price[floor][0]=val.price_m2_end
+                  if(data_range.end_price[floor][1]<val.price_m2_end) data_range.end_price[floor][1]=val.price_m2_end
+
+                  if(data_avg.count[floor]==null) data_avg.count[floor]=0
+                  data_avg.count[floor]++
+                  data_avg.first_price[floor]=val.price_m2_start+(data_avg.first_price[floor]||0)
+                  data_avg.end_price[floor]=val.price_m2_end+(data_avg.end_price[floor]||0)
+
+              })
+
+              floors= floors.sort(function(a,b){return a-b;});
+              var avgs_start = [];
+              var avgs_end = [];
+              var range_start = [];
+              var range_end = [];
+              $.each(data_avg.first_price, function(i,price){
+                  if(price == null) return;
+                  avgs_start.push([floors.indexOf(i),data_avg.first_price[i]/data_avg.count[i]])
+              })
+              $.each(data_avg.end_price, function(i,price){
+                    if(price == null) return;
+                  avgs_end.push ([floors.indexOf(i),data_avg.end_price[i]/data_avg.count[i]])
+              })
+
+              $.each(data_range.first_price, function(i,range){
+                  if(range == null) return;
+                  range_start.push ([floors.indexOf(i), range[0], range[1]])
+              })
+              $.each(data_range.end_price, function(i,range){
+                  if(range == null) return;
+                  range_end.push ([floors.indexOf(i), range[0], range[1]])
+              })
+
+              return {cat: floors, avgs_start: avgs_start, avgs_end: avgs_end, range_start: range_start, range_end: range_end};
+          }
+          redrawFloorPriceChart();
+
+      });
+  </script>
+</div>

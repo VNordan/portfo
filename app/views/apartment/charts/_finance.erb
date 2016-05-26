@@ -1,0 +1,148 @@
+<div class="tab-pane" id="financerealtor">
+  <div class="panel panel-default" style="margin-top: 20px">
+    <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+    <div class="panel-body">
+      <ul>
+        <li>Сколько денег всего получено на текущий момент (накопительным итогом) за несколько недель по всем объектам/каждому объекту?</li>
+        <li>Сколько из этой суммы ушло на услуги риэлтора?</li>
+      </ul>
+      <!--<i>Примечание: так как данные случайны, то фильтры не будут приводить к изменению графика</i>-->
+    </div>
+  </div>
+
+  <div class="col-sm-12" style="margin-top: 20px">
+    <%= render "apartment/charts/commons_part/rooms_filter" %>
+  </div>
+  <div class="row">
+    <div id="apartment-finance-realtor" class ="chart" style="height: 500px; width: 900px;"></div>
+  </div>
+  <script type="application/javascript">
+      $(function () {
+          finance_realtor_chart = new Highcharts.Chart({
+              credits:  {
+                  enabled: false
+              },
+              chart: {
+//                type: 'area'
+                  type: 'column',
+                  renderTo:'apartment-finance-realtor'
+              },
+              title: {
+                  text: 'Накопительное получение финансов'
+              },
+              xAxis: {
+                  categories: getWeeksStartsForCategories(),
+                  tickmarkPlacement: 'on'
+              },
+              yAxis: {
+                  title: {
+                      text: ''
+                  },
+                  labels: {
+                      formatter: function() {
+                          return this.value / 1000000 + ' млн ₽';
+                      }
+                  },
+                  stackLabels: {
+                      enabled: true,
+                      style: {
+                          fontWeight: 'bold',
+                          color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                      },
+                      formatter: function() {return thousands_sep((this.total/1000000).toFixed(3))}
+                  }
+              },
+              tooltip: {
+                  formatter: function() {
+                      var result = '<b>' + this.x + '</b>';
+                      $.each(this.points, function(i, datum) {
+
+                          result += '<br /> <i style="color: '+datum.point.series.color+'">'
+                                  + datum.series.name + '</i>: '
+                                  + thousands_sep((datum.y/1000000).toFixed(3)) + ' млн ₽ ';
+
+                      });
+                      return result;
+                  },
+                  shared: true,
+                  useHTML: true
+              },
+              plotOptions: {
+//                area: {
+//                    stacking: 'normal',
+//                    lineColor: '#666666',
+//                    lineWidth: 1,
+//                    marker: {
+//                        lineWidth: 1,
+//                        lineColor: '#666666'
+//                    }
+//                }
+                  column: {
+                      stacking: 'normal',
+                      dataLabels: {
+                          enabled: true,
+                          color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                          style: {
+                              textShadow: '0 0 3px black, 0 0 3px black'
+                          },
+                          formatter: function() {return thousands_sep((this.y/1000000).toFixed(3))}
+                      }
+                  }
+              },
+              series: [{
+                  name: 'Комиссия риэлтора',
+                  data: []
+              }, {
+                  name: 'Получено КП',
+                  data: []
+
+              }]
+          });
+
+          redrawFinanceRealtorChart = function(){
+              $.each(filtered_apartments, function(i,val){
+                  apart_date = moment(val.dkp_date)
+                  $.each(getWeeksStarts(), function(t,week){
+                      if(weeks_group[t]==null) weeks_group[t]=[]
+                      if (apart_date.diff(week, 'days')<0)
+                      {
+                          weeks_group[t].push(val)
+                      }
+                  })
+              })
+              weeks_data = [];
+              $.each (weeks_group, function(i,group){
+                  if (weeks_data[i]==null) weeks_data[i]={getFinance:0, fee:0}
+
+                  $.each(group, function(t,apart){
+                      weeks_data[i]['fee']+=apart.fee;
+                      weeks_data[i]['getFinance']+=apart.end_sum
+                  })
+
+              })
+              console.log(weeks_data)
+              series_fee = []
+              series_get = []
+              $.each(weeks_data, function(i,val){
+                  if (i==0){
+                      series_fee.push(val.fee)
+                      series_get.push(val.getFinance)
+                  }
+                  else{
+                      series_fee.push(val.fee)
+                      series_get.push(val.getFinance)
+                  }
+              })
+              $.each(series_fee, function(i,val){
+                  series_fee[i]=parseFloat((series_fee[i]).toFixed(0))
+                  series_get[i]=parseFloat((series_get[i]).toFixed(0))
+              })
+              finance_realtor_chart.series[0].setData(series_fee)
+              finance_realtor_chart.series[1].setData(series_get)
+          }
+
+          redrawFinanceRealtorChart();
+
+      });
+  </script>
+</div>

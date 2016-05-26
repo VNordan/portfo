@@ -1,0 +1,6 @@
+production:
+  path_to_import_dir: 'importXML/new/'  
+  path_to_archive_dir: 'importXML/old/'
+  mailserver: 'imap.yandex.ru'
+  mail_username: 'box@mail.ru'
+  mail_password: 'pwd'

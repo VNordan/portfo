@@ -1,0 +1,1747 @@
+<script type="application/javascript">
+  tenders = <%= @tenders.to_json.html_safe %>
+</script>
+<script src="http://code.highcharts.com/modules/drilldown.js"></script>
+
+<div class="row">
+  <div class="col-sm-2 col-md-offset-2" >
+    <div class="btn btn-warning" id="show_table_button" data-year="" data-month="" data-year-enter="" data-type="" data-uk="">Посмотреть конкурсы</div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-2" style="padding-top: 20px">
+    <div class="btn-group-vertical">
+      <div class="btn btn-default parent_appointment " data-childs="['жилье', 'инженерия']">
+        <div style="text-align: left;">Жилище</div>
+        <div class="btn-group-vertical childs-appointment house_appointment">
+          <div type="button" class="btn btn-default child-appointment selected">
+            <div class="sub_appointment">жилье</div>
+            <div class="btn-group house-type">
+              <button type="button" class="btn btn-default selected">ИНД</button>
+              <button type="button" class="btn btn-default selected">Сер</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-default child-appointment">инженерия</button>
+        </div>
+      </div>
+      <div class="btn btn-default parent_appointment selected" data-childs="['БНК', 'ДОУ', 'Спорт - ФОК', 'ФОК' ,'школа' ]">
+        <div style="text-align: left;">Образование</div>
+        <div class="btn-group-vertical childs-appointment social_appointment">
+          <button type="button" class="btn btn-default child-appointment selected">БНК</button>
+          <button type="button" class="btn btn-default child-appointment selected">ДОУ</button>
+          <button type="button" class="btn btn-default child-appointment selected">Спорт - ФОК</button>
+          <button type="button" class="btn btn-default child-appointment selected">ФОК</button>
+          <button type="button" class="btn btn-default child-appointment">школа</button>
+        </div>
+      </div>
+      <div class="btn btn-default parent_appointment selected" data-childs="['Поликлиника']">
+        <div style="text-align: left;">Здравоохранение</div>
+        <div class="btn-group-vertical childs-appointment social_appointment">
+          <button type="button" class="btn btn-default child-appointment selected">Поликлиника</button>
+        </div>
+      </div>
+      <div class="btn btn-default parent_appointment " data-childs="['Прочие объекты', 'переход', 'Дороги']">
+        <div style="text-align: left;">Прочее</div>
+        <div class="btn-group-vertical childs-appointment">
+          <button type="button" class="btn btn-default child-appointment ">Дороги</button>
+          <button type="button" class="btn btn-default child-appointment ">переход</button>
+          <button type="button" class="btn btn-default child-appointment ">Прочие объекты</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-sm-8">
+    <div class="col-sm-12">
+      <ul class="nav nav-tabs" role="tablist">
+        <li ><a href="#m2_house_price_tab" role="tab" data-toggle="tab">Стоимость кв м жилья</a></li>
+        <li><a href="#m2_social_price_tab" role="tab" data-toggle="tab">Стоимость одного места социалки</a></li>
+        <li><a href="#uk_house_tab" role="tab" data-toggle="tab">Стоимость кв м по УК/не УК </a></li>
+        <li><a href="#uk_social_tab" role="tab" data-toggle="tab">Стоимость места по УК/не УК </a></li>
+        <li class="active"><a href="#price_percent_tab" role="tab" data-toggle="tab">Среднее снижение стоимости</a></li>
+        <li><a href="#qty_tab" role="tab" data-toggle="tab">Число заявок</a></li>
+        <li><a href="#sum_tab" role="tab" data-toggle="tab">Сумма конкурсов</a></li>
+        <li><a href="#count_tab" role="tab" data-toggle="tab">Число конкурсов</a></li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div class="tab-pane " id="m2_house_price_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Как изменяется средняя цена за м2 жилья по годам?</li>
+
+              </ul>
+            </div>
+          </div>
+          <div id="m2_house_price_chart" style="width: 750px; height: 500px"></div>
+        </div>
+        <div class="tab-pane" id="m2_social_price_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Как изменяется средняя цена за 1 место социальных объектов по годам?</li>
+              </ul>
+            </div>
+          </div>
+          <div id="m2_social_price_chart" style="width: 750px; height: 500px"></div>
+        </div>
+        <div class="tab-pane active" id="price_percent_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Насколько в среднем понижается НМЦК при проведении конкурса по годам?</li>
+              </ul>
+            </div>
+          </div>
+          <div id="price_percent_chart" style="width: 750px; height: 500px"></div>
+        </div>
+        <div class="tab-pane" id="qty_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Какое среднее число заявок подается на конкурс? </li>
+                <li>Сколько заявок в среднем допускается? </li>
+              </ul>
+            </div>
+          </div>
+          <div id="qty_line_chart" style="width: 750px; height: 500px"></div>
+        </div>
+        <div class="tab-pane" id="uk_house_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Как изменяется средняя стоимость ед. мощности по годам по конкурсам УК и не УК?</li>
+              </ul>
+            </div>
+          </div>
+          <div id="uk_notuk_chart" style="width: 750px; height: 500px"></div>
+        </div>
+        <div class="tab-pane" id="uk_social_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Как изменяется средняя стоимость ед. мощности по годам по конкурсам УК и не УК?</li>
+              </ul>
+            </div>
+          </div>
+          <div id="uk_notuk_social_chart" style="width: 750px; height: 500px"></div>
+        </div>
+        <div class="tab-pane" id="sum_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Какой тип конкурса какую долю составляет в общем числе ?</li>
+              </ul>
+            </div>
+          </div>
+          <div id="sum_chart" style="width: 750px; height: 500px"></div>
+        </div>
+        <div class="tab-pane" id="count_tab">
+          <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+            <div class="panel-body">
+              <ul>
+                <li>Как соотносятся количества конкурсов по их типу?</li>
+              </ul>
+            </div>
+          </div>
+          <div id="count_chart" style="width: 750px; height: 500px"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-sm-12">
+      <!--<div class="btn-group tenders_years">-->
+        <!--<button type="button" class="btn btn-default selected">2011</button>-->
+        <!--<button type="button" class="btn btn-default selected">2012</button>-->
+        <!--<button type="button" class="btn btn-default selected">2013</button>-->
+        <!--<button type="button" class="btn btn-default selected">2014</button>-->
+      <!--</div>-->
+    </div>
+  </div>
+  <div class="col-sm-2">
+    <div class="btn-group-vertical tenders_types">
+      <button type="button" class="btn btn-default selected">генподрядчик</button>
+      <button type="button" class="btn btn-default selected">генпроектировщик</button>
+      <button type="button" class="btn btn-default selected">перепроектирование</button>
+      <button type="button" class="btn btn-default selected">Страхование СМР</button>
+      <button type="button" class="btn btn-default selected">ТЗ ПИР и СМР</button>
+      <button type="button" class="btn btn-default selected">ТЗ СМР</button>
+      <button type="button" class="btn btn-default selected">управляющая компания</button>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table" id="tenders_table">
+      <thead>
+      <tr>
+        <th>Адрес (серия)</th>
+        <th>Мощность</th>
+        <th>Тип</th>
+        <th>Организация</th>
+        <th>Дата окончания</th>
+        <th>Число заявок подано/допущено</th>
+        <th>НМЦК</th>
+        <th>Итоговая цена (на ед мощности)</th>
+        <th>%</th>
+      </tr>
+      </thead>
+      <tbody>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="application/javascript">
+
+    type_select = function(){
+        //add_class
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+        redrawCharts();
+    }
+
+    getAppointmentFilter = function (){
+        var res = [];
+        $.each($("button.child-appointment.selected, div.child-appointment.selected>div "), function() {
+            res.push($(this).text())
+        })
+
+        return res;
+    }
+
+    getTypeFilter = function() {
+        var res = [];
+        $.each($(".tenders_types button.selected"), function() {
+            res.push($(this).text())
+        })
+        return res;
+    }
+
+    getHouseFilter = function(){
+        var res = [];
+        $.each($(".house_appointment > button.selected"), function() {
+            res.push($(this).text())
+        })
+
+        $.each($(".house_appointment > div.selected > div.sub_appointment"), function() {
+            res.push($(this).text())
+        })
+        return res;
+    }
+
+    getHouseTypeFilter = function (){
+        var res = [];
+        $.each($(".house-type > button.selected"), function() {
+            res.push($(this).text())
+        })
+        return res;
+    }
+
+    getSocialFilter = function(){
+        var res = [];
+        $.each($(".social_appointment button.selected"), function() {
+            res.push($(this).text())
+        })
+        return res;
+    }
+
+    appointment_group_select = function(){
+        $.each($("#appointment_filter label"), function() {
+            $(this).removeClass('active');
+        })
+        setTimeout(function() {
+            $.each($("#appointment_filter_top label.active"), function() {
+                arr = eval($(this).attr('data-childs'))
+                $.each(arr, function(i, val){
+                    $("label[id='"+val+"'").addClass('active')
+                })
+            })
+           redrawCharts();
+        }, 100)
+    }
+
+    appointment_select = function(){
+        event.cancelBubble = true;
+        //add_class
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+        parent = $(this).parent()
+
+        var all = true;
+        $.each (parent.children('button'), function(i,val){
+            if (!$(val).hasClass('selected')){
+                all = false;
+            }
+        })
+        if (all)
+            $(this).parent().parent().addClass('selected');
+        else
+            $(this).parent().parent().removeClass('selected');
+
+        redrawCharts();
+    }
+
+    seriesSelect = function(){
+        event.cancelBubble = true;
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+        redrawCharts();
+    }
+
+    parent_appointment_select = function(){
+        //add_class
+        if($(this).hasClass('selected')){
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+        var all = true;
+        buttons = $(this).children('.childs-appointment').children('button')
+        $.each (buttons, function(i,val){
+            if (!$(val).hasClass('selected')){
+                all = false;
+            }
+        })
+
+        if (all){
+            $.each (buttons, function(i,val){
+                $(val).removeClass('selected')
+            })
+        }
+        else
+            $.each (buttons, function(i,val){
+                $(val).addClass('selected')
+            })
+        redrawCharts();
+    }
+
+    ///
+    setDrillDownSummChart = function(){
+        var year=$(this).text()
+        chartIsDrilldown = true;
+        var data= getDrillDownDataForSummChart(year);
+
+
+        summ_chart.xAxis[0].setCategories(months,false)
+        summ_chart.series[0].setData(data['sum'][0],false)
+        summ_chart.series[1].setData(data['sum'][1],false)
+        summ_chart.series[2].setData(data['sum'][2],true)
+
+        summ_chart.renderer.button('Назад',
+                200,
+                10,
+                returnYearSummChart).add();
+
+    }
+    ///
+    setDrillDownCountChart = function(){
+        var year=$(this).text()
+        chartIsDrilldown = true;
+        count_chart.renderer.button('Назад',
+                200,
+                10,
+                returnYearCountChart).add();
+        count_chart.xAxis[0].setCategories(months,false)
+        while(count_chart.series.length > 0)
+            count_chart.series[0].remove(false);
+
+        var data=getDrillDownDataForCountChart(year);
+        $.each(data, function(type,type_data){
+            count_chart.addSeries(type_data,false)
+        })
+        count_chart.redraw();
+
+
+    }
+    ///
+    setDrillDownQtyChart = function(){
+        var year=$(this).text()
+        chartIsDrilldown = true;
+        qty_line_chart.renderer.button('Назад',
+                200,
+                10,
+                returnYearQtyLineChart).add();
+        qty_line_chart.xAxis[0].setCategories(months,false);
+        var series = getDrillDownDataForM2Price()[2][year];
+        qty_line_chart.series[0].setData(series['data_all'], false)
+        qty_line_chart.series[1].setData(series['data_accept'] )
+
+    }
+
+    ///
+    setDrillDownPercentChart = function(){
+        var year=$(this).text()
+        chartIsDrilldown = true;
+        price_percent_chart.renderer.button('Назад',
+                150,
+                10,
+                returnYearPercentChart).add();
+
+        price_percent_chart.xAxis[0].setCategories(months,false);
+
+        var series = getDrillDownDataForM2Price()[1][year]
+
+        var data = [];
+
+        $.each(series.data, function(i,val){
+            if (val[1]!=null)
+                data.push([months.indexOf(val[0]), val[1]])
+        })
+        //console.log({name:e.point.name, data:data})
+        price_percent_chart.series[0].setData(data);
+    }
+
+    returnYearSummChart = function(){
+        chartIsDrilldown = false;
+        summ_chart.series[0].setData(getDataForSummChart()['sum'][0],false)
+        summ_chart.series[1].setData(getDataForSummChart()['sum'][1],false)
+        summ_chart.series[2].setData(getDataForSummChart()['sum'][2],false)
+        summ_chart.xAxis[0].setCategories(data.years,true)
+        $('#sum_chart .highcharts-xaxis-labels > text').click(setDrillDownSummChart);
+    }
+
+    returnYearCountChart = function(){
+        chartIsDrilldown = false;
+        while(count_chart.series.length > 0)
+            count_chart.series[0].remove(false);
+        count_data=getDataForCountChart();
+        $.each(count_data, function(type,type_data){
+            count_chart.addSeries(type_data,false)
+        })
+        count_chart.redraw();
+        $('#count_chart .highcharts-xaxis-labels > text').click(setDrillDownCountChart);
+    }
+
+    returnYearPercentChart = function(){
+
+        chartIsDrilldown = false;
+        price_percent_chart.xAxis[0].setCategories(data.years,false);
+        price_percent_chart.series[0].setData(getDataForPricePercentChart(),false)
+        price_percent_chart.redraw();
+        $('#price_percent_chart .highcharts-xaxis-labels > text').click(setDrillDownPercentChart);
+    }
+
+    returnYearQtyLineChart = function(){
+        chartIsDrilldown = false;
+        qty_line_chart.xAxis[0].setCategories(data.years,false);
+        qty_line_chart.series[0].setData(getDataForQtyLineChart()[0],false)
+        qty_line_chart.series[1].setData(getDataForQtyLineChart()[1],false)
+        qty_line_chart.redraw();
+        $('#qty_line_chart .highcharts-xaxis-labels > text').click(setDrillDownQtyChart);
+    }
+
+    $(function(){
+        //$("#appointment_filter label").change(redrawCharts);
+        $("#appointment_filter_top label").change(appointment_group_select);
+        $('.child-appointment').click(appointment_select);
+        $('.parent_appointment').click(parent_appointment_select);
+        $('.tenders_types button').click(type_select);
+        $('.house-type > button').click(seriesSelect);
+
+        $('#show_table_button').click(showTable);
+
+//        $('#sum_chart .highcharts-xaxis-labels').click(setDrillDownSummChart);
+
+        redrawCharts();
+        $('#sum_chart .highcharts-xaxis-labels > text').click(setDrillDownSummChart);
+        $('#count_chart .highcharts-xaxis-labels > text').click(setDrillDownCountChart);
+        $('#qty_line_chart .highcharts-xaxis-labels > text').click(setDrillDownQtyChart);
+        $('#price_percent_chart .highcharts-xaxis-labels > text').click(setDrillDownPercentChart);
+    })
+
+
+    getObjectSeries = function(tender){
+       if(tender.series!=null)
+        return " ("+tender.series+")"
+       return "";
+    }
+
+    var chartIsDrilldown = false;
+    showTable = function(){
+        var year = $(this).attr('data-year');
+        var month = $(this).attr('data-month');
+        var enter_year = $(this).attr('data-year-enter');
+        var type = $(this).attr('data-type');
+        var uk_flag = $(this).attr('data-uk')=='true';
+        var tenders_for_table = [];
+//        if (year==null || year=='' ) {
+//            alert ('Выберите год в графиках');
+//            return;
+//        }
+
+
+
+//        $.each(filterTendersForTable(type, month, year, enter_year),function(i,t){
+//            if (year!=null && year!='' && t.year_finish+'' == year+''){
+//                if (month==null || month == ''){
+//                    tenders_for_table.push(t)
+//                }
+//                else{
+//                    if (t.month_finish+'' == month+'')
+//                        tenders_for_table.push(t)
+//                }
+//            }
+//        })
+
+
+        bindTableRows(filterTendersForTable(type, month, year, enter_year, uk_flag));
+        $("#tenders_table").show();
+        $('html,body').animate({scrollTop: $("#tenders_table").offset().top});
+    }
+
+    filterTendersForTable = function(type, month, year, enter_year, uk_flag){
+        console.log(type, month, year, enter_year );
+        tenders = [];
+        if (type!=''){
+            //iterate by objsData and social or house
+            $.each(objsData, function (i,obj){
+
+                var year = obj.year_enter||"----";
+                if (year!=enter_year) return;
+
+                if ( type == 'social'){
+                    if ($.inArray(obj.appointment, getSocialFilter())==-1) return;
+                }
+                if (type == 'house'){
+                    if ($.inArray(obj.appointment, getHouseFilter())==-1) return;
+                    if ($.inArray(obj.series, getHouseTypeFilter())==-1) return;
+                }
+
+
+                if (uk_flag && !(objectHaveUKTenderOnly(obj) || objectDontHaveUKTenders(obj))) return;
+
+//                console.log(uk_flag && !(objectHaveUKTenderOnly(obj) || objectDontHaveUKTenders(obj)))
+                $.each(obj.tenders, function(i,t){
+                    if ($.inArray( t.type, types )==-1) return;
+                     tenders.push({
+                         object_address: obj.address,
+                         series: obj.series,
+                         type: t.type,
+                         object_power: obj.power,
+                         organization: t.organization,
+                         date_finish: t.date_finish,
+                         bid_accept: t.bid_accept,
+                         bid_all: t.bid_all,
+                         price_start: t.price_start,
+                         price_end: t.price_end,
+                         percent: t.percent
+                     })
+                })
+
+            })
+//            console.log(tenders.length);
+            return tenders;
+        }
+        $.each(filtered_tenders, function (i, t){
+            if(year!='' && t.year_finish!=year) return;
+            if (month!='' && t.month_finish!=month) return;
+            tenders.push({
+                object_address: t.object_address,
+                series: t.series,
+                type: t.type,
+                object_power: t.object_power,
+                organization: t.organization,
+                date_finish: t.date_finish,
+                bid_accept: t.bid_accept,
+                bid_all: t.bid_all,
+                price_start: t.price_start,
+                price_end: t.price_end,
+                percent: t.percent
+            })
+        })
+        console.log(tenders)
+        return tenders;
+    }
+    bindTableRows = function(data){
+
+        var tbody = $("#tenders_table tbody")
+        var rows = '';
+        $.each(data, function(i,t){
+            rows += "<tr><td>"+ t.object_address+getObjectSeries(t)+"</td>" +
+                    "<td>"+ t.object_power+"</td>"+
+                    "<td>"+ t.type+"</td>"+
+                    "<td>"+ t.organization+"</td>"+
+                    "<td>"+ t.date_finish+"</td>"+
+                    "<td>"+ t.bid_accept+"/"+t.bid_all+"</td>"+
+                    "<td>"+ thousands_sep(t.price_start.toFixed(0))+" ₽</td>"+
+                    "<td>"+ thousands_sep(t.price_end.toFixed(0))+" ("+
+                    thousands_sep((t.price_end/t.object_power).toFixed(0))+") ₽</td>"+
+                    "<td>"+ t.percent.toFixed(2)+"</td></tr>"
+
+        })
+        tbody[0].innerHTML = rows;
+    }
+
+    filtered_tenders = [];
+
+    redrawCharts = function(){
+        filter_tenders();
+        m2_price_chart.xAxis[0].setCategories(getDataForHouseM2PriceChart()[0])
+        m2_price_chart.series[0].setData(getDataForHouseM2PriceChart()[1]);
+
+        m2_social_price_chart.xAxis[0].setCategories(getDataForSocialM2PriceChart()[0])
+        m2_social_price_chart.series[0].setData(getDataForSocialM2PriceChart()[1])
+
+        uk_notuk_chart.xAxis[0].setCategories(getDataForUKNotUKM2HousePriceChart()[0])
+        uk_notuk_chart.series[0].setData(getDataForUKNotUKM2HousePriceChart()[1])
+        uk_notuk_chart.series[1].setData(getDataForUKNotUKM2HousePriceChart()[2])
+
+        uk_notuk_social_chart.xAxis[0].setCategories(getDataForUKNotUKM2SocialPriceChart()[0])
+        uk_notuk_social_chart.series[0].setData(getDataForUKNotUKM2SocialPriceChart()[1])
+        uk_notuk_social_chart.series[1].setData(getDataForUKNotUKM2SocialPriceChart()[2])
+
+        price_percent_chart.series[0].setData(getDataForPricePercentChart())
+        qty_line_chart.series[0].setData(getDataForQtyLineChart()[0])
+        qty_line_chart.series[1].setData(getDataForQtyLineChart()[1])
+
+        summ_chart.series[0].setData(getDataForSummChart()['sum'][0])
+        summ_chart.series[1].setData(getDataForSummChart()['sum'][1])
+        summ_chart.series[2].setData(getDataForSummChart()['sum'][2])
+
+        while(count_chart.series.length > 0)
+            count_chart.series[0].remove(false);
+        count_data=getDataForCountChart();
+        $.each(count_data, function(type,type_data){
+            count_chart.addSeries(type_data,false)
+        })
+        count_chart.redraw();
+    }
+
+    filter_tenders = function(){
+        types = getTypeFilter();
+        appointments = getAppointmentFilter();
+        filtered_tenders.length=0;
+        $.each(tenders, function(i,t){
+            if ($.inArray( t.type, types )!=-1 &&
+                    $.inArray(t.appointment, appointments)!= -1)
+            {
+                filtered_tenders.push(t);
+            }
+        })
+
+    }
+
+    setEnterYearForTable = function (type, year, uk_flag){
+        uk_flag = uk_flag||false;
+        $('#show_table_button').attr('data-year-enter', year);
+        $('#show_table_button').attr('data-type', type);
+        $('#show_table_button').attr('data-uk', uk_flag);
+    }
+
+    setAttrYearOrMonthFotTable = function (value){
+        if (chartIsDrilldown)
+            $('#show_table_button').attr('data-month', months.indexOf(value)+1);
+        else
+            $('#show_table_button').attr('data-year', value);
+    }
+
+    m2_price_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'spline',
+            renderTo:'m2_house_price_chart'
+        },
+        title: {
+            text: 'Изменение средней стоимости кв. м. '
+        },
+        xAxis: {
+            type: 'category'
+            //categories: getDataForHouseM2PriceChart()[0]
+        },
+        yAxis: {
+            title: {
+                text: 'Средняя стоимость кв. м.'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value/1000 + 'тыс ₽';
+                }
+            },
+            min: 0
+        },
+        tooltip: {
+            crosshairs: true,
+            useHTML: true,
+            //valueSuffix: ' тыс. руб'
+            formatter: function() {
+                return "" +
+                    "<b>"+this.point.category+"</b><br>" +
+                    "<i>"+this.series.name+"</i>: "+
+                        thousands_sep(this.y) + '  ₽ '}
+
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            },
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setEnterYearForTable('house', this.category);
+                        }
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'средняя стоимость кв. м по годам ввода'
+           // data: getDataForHouseM2PriceChart()[1]
+        }],
+        drilldown: {
+            series: []
+        }
+    });
+
+    m2_social_price_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'spline',
+            renderTo:'m2_social_price_chart'
+        },
+        title: {
+            text: 'Изменение средней стоимости одного места '
+        },
+        xAxis: {
+            type: 'category'
+//            categories: data.years
+        },
+        yAxis: {
+            title: {
+                text: 'Средняя стоимость места'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value/1000000 + ' млн. ₽';
+                }
+            },
+            min: 0
+        },
+        tooltip: {
+            crosshairs: true,
+            useHTML: true,
+            //valueSuffix: ' тыс. руб'
+            formatter: function() {
+                return "" +
+                        "<b>"+this.point.category+"</b><br>" +
+                        "<i>"+this.series.name+"</i>: "+
+                        thousands_sep((this.y/1000).toFixed(0)) + ' тыс  ₽'}
+
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            },
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setEnterYearForTable('social', this.category);
+                        }
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'средняя стоимость места по годам ввода',
+            data: [{y: 0}]
+        }],
+        drilldown: {
+            series: []
+        }
+    });
+
+    price_percent_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'spline',
+            renderTo:'price_percent_chart'
+        },
+        title: {
+            text: 'Среднее снижение цены от НМЦК'
+        },
+        xAxis: {
+            categories: data.years
+        },
+        yAxis: {
+            title: {
+                text: 'Среднее снижение цены (%)'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value + '% ';
+                }
+            },
+            min: 0
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+            valueSuffix: '%'
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            },
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setAttrYearOrMonthFotTable(this.category);
+                        }
+                    }
+                }
+            }
+
+        },
+        series: [{
+            name: 'Снижение цены',
+            data: [{y: 0}]
+        }]
+    });
+
+    qty_line_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'spline',
+            renderTo:'qty_line_chart'
+        },
+        title: {
+            text: 'Среднее число заявок'
+        },
+        xAxis: {
+            categories: data.years
+        },
+        yAxis: {
+            title: {
+                text: 'Число заявок'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value + '';
+                }
+            },
+            min: 0
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+            valueSuffix: ' шт'
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+
+            },
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setAttrYearOrMonthFotTable(this.category);
+                        }
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Среднее число поданных заявок',
+            data: [{y: 0}]
+        },
+        {
+            name: 'Среднее число допущенных заявок',
+            data: [{y: 0}]
+        }]
+
+    });
+
+    uk_notuk_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'spline',
+            renderTo:'uk_notuk_chart'
+        },
+        title: {
+            text: 'Изменение средней стоимости кв м'
+        },
+        xAxis: {
+            title: {
+                text: 'год ввода'
+            },
+            type: 'category'
+        },
+        yAxis: {
+            title: {
+                text: 'Средняя стоимость кв м'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value/1000 + ' тыс  ₽';
+                }
+            },
+            min: 0
+        },
+        tooltip: {
+            crosshairs: true,
+            useHTML: true,
+            //valueSuffix: ' тыс. руб'
+            formatter: function() {
+                return "" +
+                        "<b>"+this.point.category+"</b><br>" +
+                        "<i>"+this.series.name+"</i>: "+
+                        thousands_sep((this.y/1000).toFixed(0)) + ' тыс ₽'}
+
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            },
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setEnterYearForTable('house',  this.category,true);
+                        }
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'средняя стоимость кв м объектов только с УК',
+            data: []
+        },{
+            name: 'средняя стоимость кв м объектов без УК',
+            data: []
+        }]
+    });
+
+    uk_notuk_social_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'spline',
+            renderTo:'uk_notuk_social_chart'
+        },
+        title: {
+            text: 'Изменение средней стоимости места'
+        },
+        xAxis: {
+            title: {
+                text: 'год ввода'
+            },
+            type: 'category'
+//            categories: data.years
+        },
+        yAxis: {
+            title: {
+                text: 'Средняя стоимость места'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value/1000 + ' тыс  ₽';
+                }
+            },
+            min: 0
+        },
+        tooltip: {
+            crosshairs: true,
+            useHTML: true,
+            //valueSuffix: ' тыс. руб'
+            formatter: function() {
+                return "" +
+                        "<b>"+this.point.category+"</b><br>" +
+                        "<i>"+this.series.name+"</i>: "+
+                        thousands_sep((this.y/1000).toFixed(0)) + ' тыс ₽'}
+
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            },
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setEnterYearForTable('social', this.category, true);
+                        }
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'средняя стоимость места объектов только с УК',
+            data: []
+        },{
+            name: 'средняя стоимость места объектов без УК',
+            data: []
+        }]
+    });
+
+    summ_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'column',
+            renderTo:'sum_chart'
+        },
+        title: {
+            text: 'Доля конкурсов по их типу'
+        },
+        xAxis: {
+            type: 'category',
+            categories: data.years
+        },
+        yAxis: {
+            title: {
+                text: 'Доля конкурсов по типу'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value/1000 + ' млн ₽';
+                }
+            }
+        },
+        tooltip:{
+            formatter: function() {
+                var result = '<b>' + this.x + '</b>';
+                var sum = 0;
+                $.each(this.points, function(i, datum) {
+                    sum+=datum.y;
+                });
+                $.each(this.points, function(i, datum) {
+                    result += '<br /> <i style="color: '+datum.point.series.color+'">'
+                            + datum.series.name + '</i>: '
+                            + thousands_sep(datum.y.toFixed(0)) + ' млн ₽ ('
+                            + (datum.y*100/sum).toFixed(0) + '%)';
+                });
+                //result += '<br />Среднее снижение цены ' + this.points[0].point.percent + '%'
+
+                return result;
+            },
+            //headerFormat: '<div style="font-size:13px">{point.key}</div>',
+            //pointFormat: '<div><b>{series.name}</b>: ' + '{point.y} человек</div>' ,
+            //footerFormat: '',
+            shared: true,
+            useHTML: true
+        },
+
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setAttrYearOrMonthFotTable(this.category);
+                        }
+                    }
+                }
+            }
+//            column: {
+//                stacking: 'none'
+//            }
+        },
+        series: [{
+            name:'Прочее',
+            data: [],
+            drilldown:true
+        },
+        {
+            name:'Генподряд',
+            data: [],
+            drilldown:true
+        },
+        {
+            name:'УК',
+            data: [],
+            drilldown:true
+        }],
+        drilldown: {
+            series: []
+        }
+    });
+    count_chart = new Highcharts.Chart({
+        credits:  {
+            enabled: false
+        },
+        chart: {
+            type: 'column',
+            renderTo:'count_chart'
+        },
+        title: {
+            text: 'Доля конкурсов по их типу'
+        },
+        xAxis: {
+            type: 'category',
+            categories: data.years
+        },
+        yAxis: {
+            title: {
+                text: 'Доля конкурсов по типу'
+            }
+        },
+        tooltip:{
+            formatter: function() {
+                var result = '<b>' + this.x + '</b>';
+                var sum = 0;
+                $.each(this.points, function(i, datum) {
+                    sum+=datum.y;
+                });
+                $.each(this.points, function(i, datum) {
+                    result += '<br /> <i style="color: '+datum.point.series.color+'">'
+                            + datum.series.name + '</i>: '
+                            + thousands_sep(datum.y.toFixed(0)) + ' процедур ('
+                            + (datum.y*100/sum).toFixed(0) + '%)';
+                });
+                //result += '<br />Среднее снижение цены ' + this.points[0].point.percent + '%'
+
+                return result;
+            },
+            //headerFormat: '<div style="font-size:13px">{point.key}</div>',
+            //pointFormat: '<div><b>{series.name}</b>: ' + '{point.y} человек</div>' ,
+            //footerFormat: '',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events:{
+                        click: function(e){
+                            setAttrYearOrMonthFotTable(this.category);
+                        }
+                    }
+                }
+            }
+//            column: {
+//                stacking: 'percent'
+//            }
+        },
+        series: []
+    });
+
+
+    getDataForHouseM2PriceChart = function(){
+        var years = [];
+        var prices = {};
+        $.each(objsData, function (i,obj){
+            if ($.inArray(obj.appointment, getHouseFilter())==-1) return;
+            if ($.inArray(obj.series, getHouseTypeFilter())==-1) return;
+
+            var year = obj.year_enter||"----";
+            if (years.indexOf(year)==-1) years.push (year)
+
+            if (prices[year]==null) prices[year] = {power:0, sum: 0};
+            var tenders_sum = 0;
+            $.each(obj.tenders, function(i,tender){
+
+                if ($.inArray(tender.type, getTypeFilter())==-1 )
+                    return;
+                tenders_sum+=tender.sum
+            })
+            prices[year].power+=obj.power
+            prices[year].sum+=tenders_sum
+        })
+        years = years.sort();
+        var data = [];
+        $.each(years, function(i,year){
+            data[i]= parseFloat((prices[year].sum/(prices[year].power||1)).toFixed(0))
+        })
+        return [years, data];
+    }
+
+    getDataForSocialM2PriceChart = function(){
+        var years = [];
+        var prices = {};
+        $.each(objsData, function (i,obj){
+            if ($.inArray(obj.appointment, getSocialFilter())==-1) return;
+
+
+            var year = obj.year_enter||"----";
+            if (years.indexOf(year)==-1) years.push (year)
+
+            if (prices[year]==null) prices[year] = {power:0, sum: 0};
+            var tenders_sum = 0;
+            $.each(obj.tenders, function(i,tender){
+
+                if ($.inArray(tender.type, getTypeFilter())==-1 )
+                    return;
+                tenders_sum+=tender.sum
+            })
+            prices[year].power+=obj.power
+            prices[year].sum+=tenders_sum
+        })
+        years = years.sort();
+        console.log(prices, years);
+        var data = [];
+        $.each(years, function(i,year){
+            data[i]= parseFloat((prices[year].sum/(prices[year].power||1)).toFixed(0))
+        })
+
+
+        return [years, data];
+    }
+
+    objectHaveUKTenderOnly = function(obj){
+        var not_uk_exist = false;
+        $.each(obj.tenders, function(i,tender){
+            if (tender.type != 'управляющая компания')
+                not_uk_exist = true;
+        })
+       return !not_uk_exist;
+    }
+    objectDontHaveUKTenders = function(obj){
+        var uk_exist = false;
+        $.each(obj.tenders, function(i,tender){
+            if (tender.type == 'управляющая компания')
+                uk_exist = true;
+        })
+        return !uk_exist;
+    }
+    getDataForUKNotUKM2HousePriceChart = function(){
+        var years = [];
+        var prices_uk = {};
+        var prices_not_uk = {};
+        $.each(objsData, function (i,obj){
+            if ($.inArray(obj.appointment, getHouseFilter())==-1) return;
+            if ($.inArray(obj.series, getHouseTypeFilter())==-1) return;
+
+            if (objectHaveUKTenderOnly(obj)==false && objectDontHaveUKTenders(obj)==false) return;
+
+            var year = obj.year_enter||"----";
+            if (years.indexOf(year)==-1) years.push (year)
+
+            if (objectHaveUKTenderOnly(obj))
+            {
+                if (prices_uk[year]==null) prices_uk[year] = {power:0, sum: 0};
+                var tenders_sum = 0;
+                $.each(obj.tenders, function(i,tender){
+                    if ($.inArray(tender.type, types)==-1 )
+                        return;
+                    tenders_sum+=tender.sum
+                })
+                prices_uk[year].power+=obj.power
+                prices_uk[year].sum+=tenders_sum
+            }
+            if (objectDontHaveUKTenders(obj)){
+                if (prices_not_uk[year]==null) prices_not_uk[year] = {power:0, sum: 0};
+                var tenders_sum = 0;
+                $.each(obj.tenders, function(i,tender){
+                    if ($.inArray(tender.type, types)==-1 )
+                        return;
+                    tenders_sum+=tender.sum
+                })
+                prices_not_uk[year].power+=obj.power
+                prices_not_uk[year].sum+=tenders_sum
+            }
+
+        })
+        years = years.sort();
+        var data_uk = [];
+        var data_not_uk = [];
+        $.each(years, function(i,year){
+            var price_uk = null;
+            var price_not_uk=null;
+            if (prices_uk[year]!=null)  price_uk = parseFloat((prices_uk[year].sum/(prices_uk[year].power||1)).toFixed(0))
+            if (prices_not_uk[year]!=null) price_not_uk = parseFloat((prices_not_uk[year].sum/(prices_not_uk[year].power||1)).toFixed(0))
+            data_uk[i] = price_uk;
+            data_not_uk[i] = price_not_uk;
+        })
+        return [years, data_uk, data_not_uk];
+    }
+
+    getDataForUKNotUKM2SocialPriceChart = function(){
+        var years = [];
+        var prices_uk = {};
+        var prices_not_uk = {};
+        $.each(objsData, function (i,obj){
+            if ($.inArray(obj.appointment, getSocialFilter())==-1) return;
+
+            if (objectHaveUKTenderOnly(obj)==false && objectDontHaveUKTenders(obj)==false) return;
+
+            var year = obj.year_enter||"----";
+            if (years.indexOf(year)==-1) years.push (year)
+
+            if (objectHaveUKTenderOnly(obj))
+            {
+//                console.log('uk',obj);
+                if (prices_uk[year]==null) prices_uk[year] = {power:0, sum: 0};
+                var tenders_sum = 0;
+                $.each(obj.tenders, function(i,tender){
+                    if ($.inArray(tender.type, types)==-1 )
+                        return;
+                    tenders_sum+=tender.sum
+                })
+                prices_uk[year].power+=obj.power
+                prices_uk[year].sum+=tenders_sum
+            }
+            if (objectDontHaveUKTenders(obj)){
+//                console.log('not_uk',obj);
+                if (prices_not_uk[year]==null) prices_not_uk[year] = {power:0, sum: 0};
+                var tenders_sum = 0;
+                $.each(obj.tenders, function(i,tender){
+                    if ($.inArray(tender.type, types)==-1 )
+                        return;
+                    tenders_sum+=tender.sum
+                })
+                prices_not_uk[year].power+=obj.power
+                prices_not_uk[year].sum+=tenders_sum
+            }
+
+        })
+        years = years.sort();
+        var data_uk = [];
+        var data_not_uk = [];
+        $.each(years, function(i,year){
+            var price_uk = null;
+            var price_not_uk=null;
+            if (prices_uk[year]!=null)  price_uk = parseFloat((prices_uk[year].sum/(prices_uk[year].power||1)).toFixed(0))
+            if (prices_not_uk[year]!=null) price_not_uk = parseFloat((prices_not_uk[year].sum/(prices_not_uk[year].power||1)).toFixed(0))
+            data_uk[i] = price_uk;
+            data_not_uk[i] = price_not_uk;
+        })
+        return [years, data_uk, data_not_uk];
+    }
+
+    getDataForM2PriceChart = function()
+    {
+        var res = []
+        var tmp_res = {};
+
+        $.each(tenders, function(i,val){
+           if ($.inArray(val.type, types)==-1 || $.inArray(val.appointment, getHouseFilter())==-1)
+           return;
+           if($.inArray(val.series, getHouseTypeFilter())==-1) return;
+
+           if (tmp_res[val.year_finish]==null)
+            tmp_res[val.year_finish]={m2:0, count:0}
+
+            tmp_res[val.year_finish]['m2'] += val.price_m2_end;
+            tmp_res[val.year_finish]['count'] ++;
+        });
+        $.each(tmp_res, function(i,val){
+            res.push({y:parseFloat((val.m2/(val.count*1000)).toFixed(0)), name: i, drilldown:true});
+        })
+
+
+        return res;
+    }
+
+    getDataForUKM2PriceChart = function()
+    {
+        var res_uk = [];
+        var res_not_uk = [];
+        var uk = {};
+        var notuk = {};
+
+        $.each(filtered_tenders, function(i,val){
+
+            if (uk[val.year_finish]==null)
+                uk[val.year_finish]={m2:0, count:0}
+            if (notuk[val.year_finish]==null)
+                notuk[val.year_finish]={m2:0, count:0}
+
+            if (val.uk_only){
+                uk[val.year_finish]['m2'] += val.price_m2_end;
+                uk[val.year_finish]['count'] ++;
+            }
+            if (val.without_uk){
+                notuk[val.year_finish]['m2'] += val.price_m2_end;
+                notuk[val.year_finish]['count'] ++;
+            }
+        });
+        $.each(uk, function(i,val){
+            res_uk.push({y:parseFloat((val.m2/(val.count*1000)).toFixed(0)), name: i, drilldown:true});
+        })
+        $.each(notuk, function(i,val){
+            res_not_uk.push({y:parseFloat((val.m2/(val.count*1000)).toFixed(0)), name: i, drilldown:true});
+        })
+        return [res_uk, res_not_uk];
+    }
+
+    getDataForM2SocialPriceChart = function()
+    {
+        var res = []
+        var tmp_res = {};
+
+        $.each(tenders, function(i,val){
+            if ($.inArray(val.type, types)==-1 || $.inArray(val.appointment, getSocialFilter())==-1)
+                return;
+
+            if (tmp_res[val.year_finish]==null)
+                tmp_res[val.year_finish]={m2:0, count:0}
+
+            tmp_res[val.year_finish]['m2'] += val.price_m2_end;
+            tmp_res[val.year_finish]['count'] ++;
+        });
+        $.each(tmp_res, function(i,val){
+            res.push({y:parseFloat((val.m2/(val.count*1000)).toFixed(0)), name: i, drilldown:true});
+        })
+        return res;
+    }
+
+    getDataForPricePercentChart = function()
+    {
+        var res = []
+        var tmp_res = {};
+        $.each(filtered_tenders, function(i,val){
+            if (tmp_res[val.year_finish]==null)
+                tmp_res[val.year_finish]={percent:0, count:0}
+
+            tmp_res[val.year_finish]['percent'] += val.percent;
+            tmp_res[val.year_finish]['count'] ++;
+        })
+        $.each(tmp_res, function(i,val){
+            res.push({y:parseFloat((val.percent/val.count).toFixed(0)), name: i});
+        })
+        return res
+    }
+
+    getDataForSummChart = function()
+    {
+        var res = {}
+        var tmp_res = {};
+
+        $.each(filtered_tenders, function(i,val){
+
+            if (tmp_res[val.year_finish]==null)
+                tmp_res[val.year_finish]={}
+            var type = (val.type=="управляющая компания"||val.type=="генподрядчик") ? val.type : 'Другое'
+            if(tmp_res[val.year_finish][type]==null)
+               tmp_res[val.year_finish][type]={sum:0, count:0}
+
+            tmp_res[val.year_finish][type]['sum'] += val.price_end;
+            tmp_res[val.year_finish][type]['count'] ++;
+        });
+
+        console.log(tmp_res)
+        summ_data = {}
+
+        $.each(tmp_res, function(year, year_data){
+            $.each(year_data, function(type, data){
+
+                if(summ_data[type]==null)
+                    summ_data[type]=[]
+                summ_data[type].push(data.sum/1000000)
+            })
+        })
+        //Другое, ГП, УК
+        return {sum: [summ_data['Другое'],summ_data['генподрядчик'],summ_data['управляющая компания']]}
+    }
+
+    getDataForCountChart = function()
+    {
+        var tmp_res = {};
+        $.each(filtered_tenders, function(i,val){
+
+            if (tmp_res[val.year_finish]==null)
+                tmp_res[val.year_finish]={}
+            var type = val.type
+            if(tmp_res[val.year_finish][type]==null)
+                tmp_res[val.year_finish][type]={count:0}
+
+
+            tmp_res[val.year_finish][type]['count'] ++;
+        });
+        var count_data = {}
+        $.each(tmp_res, function(year, year_data){
+            $.each(year_data, function(type, data){
+                if(count_data[type]==null)
+                    count_data[type]={name: type, data:[]}
+                count_data[type]['data'].push([parseInt(year), data.count])
+            })
+        })
+        return count_data;
+    }
+
+    getDataForQtyLineChart = function()
+    {
+        var res_all = [];
+        var res_accept = [];
+        var tmp_res = {};
+        $.each(filtered_tenders, function(i,val){
+            if (tmp_res[val.year_finish]==null)
+                tmp_res[val.year_finish]={all:0, count:0, accept:0}
+
+            tmp_res[val.year_finish]['all'] += val.bid_all;
+            tmp_res[val.year_finish]['accept'] += val.bid_accept;
+            tmp_res[val.year_finish]['count'] ++;
+        });
+
+        $.each(tmp_res, function(i,val){
+            //res_all.push(parseFloat((val.all/val.count).toFixed(3)));
+            //res_accept.push(parseFloat((val.accept/val.count).toFixed(3)));
+            res_all.push({y:parseFloat((val.all/val.count).toFixed(1)), name: i});
+            res_accept.push({y:parseFloat((val.accept/val.count).toFixed(1)), name: i});
+        });
+
+        return [res_all, res_accept];
+    }
+
+    months = ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+    drillDownMonthsCategories = [
+        ['Янв',0],['Фев',0],['Март',0],['Апр',0],['Май',0],['Июнь',0],['Июль',0],['Авг',0],['Сен',0],['Окт',0],['Ноя',0],['Дек',0]
+    ]
+    getDrillDownDataForM2Price = function (){
+        m2_house={};
+        m2_social={};
+        avgs = {};
+        percents_data={};
+        qty_data={};
+        uk_data={};
+
+
+        $.each(filtered_tenders, function(i,val){
+          if (avgs[val.year_finish]==null)
+            avgs[val.year_finish] = {}
+
+          if (avgs[val.year_finish][val.month_finish]==null)
+            avgs[val.year_finish][val.month_finish]={m2_house: 0, house_count: 0, social_count:0,
+                                                    m2_social: 0, count:0, percent: 0, qty_all: 0, qty_accept:0,
+                                                    uk_price:0, uk_count:0, notuk_price:0, notuk_count:0}
+
+            //avgs[val.year_finish][val.month_finish]['m2']+=val.price_m2_end
+            avgs[val.year_finish][val.month_finish]['percent']+=val.percent
+            avgs[val.year_finish][val.month_finish]['qty_all']+=val.bid_all
+            avgs[val.year_finish][val.month_finish]['qty_accept']+=val.bid_accept
+            avgs[val.year_finish][val.month_finish]['count']++;
+            if (val.uk_only){
+                avgs[val.year_finish][val.month_finish]['uk_price']+=val.price_m2_end;
+                avgs[val.year_finish][val.month_finish]['uk_count']++;
+            }
+            if (val.without_uk){
+                avgs[val.year_finish][val.month_finish]['notuk_price']+=val.price_m2_end;
+                avgs[val.year_finish][val.month_finish]['notuk_count']++;
+            }
+        })
+
+        $.each(tenders, function(i,val){
+            if ($.inArray(val.type, types)!=-1 && $.inArray(val.appointment, getSocialFilter())!=-1){
+                if (avgs[val.year_finish]==null)
+                    avgs[val.year_finish] = {}
+
+                if (avgs[val.year_finish][val.month_finish]==null)
+                    avgs[val.year_finish][val.month_finish]={m2_house: 0, house_count: 0, social_count:0,
+                        m2_social: 0, count:0, percent: 0, qty_all: 0, qty_accept:0}
+
+                avgs[val.year_finish][val.month_finish]['m2_social']+=val.price_m2_end;
+                avgs[val.year_finish][val.month_finish]['social_count']++;
+            }
+
+            if ($.inArray(val.type, types)!=-1 && $.inArray(val.appointment, getHouseFilter())!=-1)
+            {
+                if (avgs[val.year_finish]==null)
+                    avgs[val.year_finish] = {}
+
+                if (avgs[val.year_finish][val.month_finish]==null)
+                    avgs[val.year_finish][val.month_finish]={m2_house: 0, house_count: 0, social_count:0,
+                        m2_social: 0, count:0, percent: 0, qty_all: 0, qty_accept:0}
+
+                avgs[val.year_finish][val.month_finish]['m2_house']+=val.price_m2_end;
+                avgs[val.year_finish][val.month_finish]['house_count']++;
+            }
+
+        })
+        //console.log(avgs);
+
+
+        $.each (avgs, function(year,val){
+            if(m2_house[year]==null)
+                m2_house[year]={name: year+'', data:[
+                    ['Янв',null],['Фев',null],['Март',null],['Апр',null],['Май',null],['Июнь',null],['Июль',null],['Авг',null],['Сен',null],['Окт',null],['Ноя',null],['Дек',null]
+                ]}
+
+            $.each(val, function(month, month_data){
+                //console.log((month_data.m2_house/(month_data['house_count'])))
+                m2_house[year]['data'][month-1][1]= parseFloat((month_data.m2_house/(month_data['house_count']*1000)).toFixed(0))||0
+                if (m2_house[year]['data'][month-1][1]==0) {
+                    m2_house[year]['data'][month-1][1]=null
+                }
+
+
+            })
+
+        })
+        $.each (avgs, function(year,val){
+            if(m2_social[year]==null)
+                m2_social[year]={name: year+'', data:[
+                    ['Янв',null],['Фев',null],['Март',null],['Апр',null],['Май',null],['Июнь',null],['Июль',null],['Авг',null],['Сен',null],['Окт',null],['Ноя',null],['Дек',null]
+                ]}
+            $.each(val, function(month, month_data){
+                m2_social[year]['data'][month-1][1]=  parseFloat((month_data.m2_social/(month_data['social_count']*1000)).toFixed(0))||0
+                if (m2_social[year]['data'][month-1][1]==0) {
+                    m2_social[year]['data'][month-1][1]=null
+                }
+            })
+        })
+
+        $.each (avgs, function(year,val){
+            if(percents_data[val.year_finish]==null)
+                percents_data[year]={name: year+'', data:[
+                    ['Янв',null],['Фев',null],['Март',null],['Апр',null],['Май',null],['Июнь',null],['Июль',null],['Авг',null],['Сен',null],['Окт',null],['Ноя',null],['Дек',null]
+                ]}
+            $.each(val, function(month, month_data){
+                percents_data[year]['data'][month-1][1]=parseFloat((month_data.percent/(month_data['count'])).toFixed(2))||0
+                if (percents_data[year]['data'][month-1][1]==0) {
+                    percents_data[year]['data'][month-1][1]=null
+                }
+            })
+        })
+
+        $.each (avgs, function(year,val){
+            if(qty_data[val.year_finish]==null)
+                qty_data[year]={name: year+'', data_all:[], data_accept:[]}
+            $.each(val, function(month, month_data){
+                qty_data[year]['data_all'][month-1]=parseFloat((month_data.qty_all/(month_data['count'])).toFixed(1))||null
+                qty_data[year]['data_accept'][month-1]=parseFloat((month_data.qty_accept/(month_data['count'])).toFixed(1))||null
+            })
+        })
+
+        $.each (avgs, function(year,val){
+            if(uk_data[val.year_finish]==null)
+                uk_data[year]={name: year+'', uk:[], notuk:[]}
+            $.each(val, function(month, month_data){
+                uk_data[year]['uk'][month-1]=parseFloat((month_data.uk_price/((month_data['uk_count']*1000)||1)).toFixed(3))||null
+                uk_data[year]['notuk'][month-1]=parseFloat((month_data.notuk_price/((month_data['notuk_count']*1000)||1)).toFixed(3))||null
+            })
+        })
+
+        console.log([[m2_house, m2_social],percents_data, qty_data, uk_data])
+        return [[m2_house, m2_social],percents_data, qty_data, uk_data];
+    }
+
+
+    getDrillDownDataForSummChart = function(year){
+
+        var tmp_res = {};
+
+        $.each(filtered_tenders, function(i,val){
+            if (val.year_finish != year)
+                return;
+
+            if (tmp_res[val.month_finish]==null)
+                tmp_res[val.month_finish]={}
+            var type = (val.type=="управляющая компания"||val.type=="генподрядчик") ? val.type : 'Другое'
+            if(tmp_res[val.month_finish][type]==null)
+                tmp_res[val.month_finish][type]={sum:0}
+
+            tmp_res[val.month_finish][type]['sum'] += val.price_end;
+
+        });
+
+
+        summ_data = {}
+
+        $.each(tmp_res, function(month, month_data){
+            $.each(month_data, function(type, data){
+                if(summ_data[type]==null)
+                    summ_data[type]=[]
+                summ_data[type][month-1]=(data.sum/1000000)
+            })
+        })
+
+        $.each(summ_data, function(type, type_data){
+            for(var i = 0; i<12; i++)
+            {
+                if (type_data[i]==null) type_data[i]=null
+            }
+        })
+        //Другое, ГП, УК
+        return {sum: [summ_data['Другое'],summ_data['генподрядчик'],summ_data['управляющая компания']]}
+    }
+
+    getDrillDownDataForCountChart = function(year){
+        var tmp_res = {};
+        $.each(filtered_tenders, function(i,val){
+
+            if (val.year_finish != year)
+                return;
+
+            if (tmp_res[val.month_finish]==null)
+                tmp_res[val.month_finish]={}
+            var type = val.type
+            if(tmp_res[val.month_finish][type]==null)
+                tmp_res[val.month_finish][type]={count:0}
+
+
+            tmp_res[val.month_finish][type]['count'] ++;
+        });
+        var count_data = {}
+        $.each(tmp_res, function(month, month_data){
+            $.each(month_data, function(type, data){
+                if(count_data[type]==null)
+                    count_data[type]={name: type, data:[]}
+                count_data[type]['data'].push([parseInt(month-1), data.count])
+            })
+        })
+        return count_data;
+    }
+
+
+</script>

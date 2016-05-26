@@ -1,0 +1,52 @@
+<h2>Просмотр числа вакансий за <%= Date.today.prev_year(2).strftime("%B, %Y") %></h2>
+
+<p>
+<a href="/vacancies/edit">редактировать</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="/employee/index">вернуться</a>
+</p>
+
+<form action="show" method="GET" role="form" class="form-inline">
+
+    <label>Выберите год:</label>
+    <select name="mon_select[year]" class="form-control" value="2014">
+      <% @year_list.each do |year| %>
+        <option><%= year %></option>
+      <% end %>
+    </select>
+
+    <label>месяц:</label>
+    <select name="mon_select[month]" class="form-control" value="">
+      <% @month_list.each do |month| %>
+        <option><%= month %></option>
+      <% end %>
+    </select>
+  
+    <button type="submit" class="btn btn-primary">Показать</button>
+  
+</form>
+
+
+<TABLE class="table table-bordered">
+  <THEAD>
+    <TR>
+<!--       <TH>Id</TH> -->
+      <TH>Месяц</TH>
+      <TH>Количество вакансий</TH>
+<!--       <TH>Id отдела</TH> -->
+      <TH>Название отдела</TH>
+    </TR>
+  </THEAD>
+  <TBODY>
+    <% @vacancy.each do |vacancy| %>
+    <TR>
+<!--       <TD><%= vacancy.id %></TD> -->
+      <TD><%= vacancy.month %></TD>
+      <TD><%= vacancy.vacancy_count %></TD>
+<!--       <TD><%= vacancy.department_id %></TD> -->
+      <TD><%= vacancy.dep_name %></TD>
+    </TR>
+    <% end %>
+  </TBODY> 
+</TABLE>
+
+<p><a href="/vacancies/edit">редактировать</a></p>

@@ -1,0 +1,105 @@
+<div class="panel panel-default hide" >
+  <div class="panel-heading">Список вопросов, на которые отвечает график</div>
+  <div class="panel-body">
+    <ul>
+      <li>Каков предельный объем инвестиций для объектов разного года ввода?</li>
+      <li>Какова средний объем инвестиций на 1 объект определенного года ввода?</li>
+    </ul>
+  </div>
+</div>
+
+<div id="years_finance" style="width: 900px; height: 500px; display: none"></div>
+<script type="application/javascript">
+
+    years_finance_prepare_data = function (){
+        var res = {};
+        var years = [];
+        var avg = {};
+        $.each(data.objects, function(i,val){
+            if (isNaN(res[val.year])) res[val.year]=0;
+            if (isNaN(avg[val.year])) avg[val.year]=0;
+            res[val.year] += val.AIP;
+            avg[val.year] ++;
+        });
+        $.each(res, function(i,val){
+            years.push(i)
+            avg[i] = res[i]/avg[i]
+        });
+        res =  $.map(res, function(el) { return parseFloat((el/1000000).toFixed(3)); })
+        avg =  $.map(avg, function(el) { return parseFloat((el/1000000).toFixed(3)); })
+        return [years,res,avg];
+    }
+    //var years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018];
+    $(function () {
+        $('#years_finance').highcharts({
+            credits:  {
+                enabled: false
+            },
+            title: {
+                text: 'Объемы инвестиций'
+            },
+            xAxis: {
+                categories: years_finance_prepare_data()[0]
+            },
+            tooltip: {
+                shared: true,
+                valueSuffix: ' млн руб'
+            },
+            yAxis: [{ // Primary yAxis
+                labels: {
+                    format: '{value} млн руб',
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                },
+                title: {
+                    text: 'Объем инвестиций',
+                    style: {
+                        color: Highcharts.getOptions().colors[0]
+                    }
+                }
+            }, { // Secondary yAxis
+                min: 0,
+                title: {
+                    text: 'Средний объем инвестиций',
+                    style: {
+                        color: Highcharts.getOptions().colors[1]
+                    }
+                },
+                labels: {
+                    format: '{value} млн руб',
+                    style: {
+                        color: Highcharts.getOptions().colors[1]
+                    }
+                },
+                opposite: true
+            }],
+            labels: {
+                items: [{
+                    html: '',
+                    style: {
+                        left: '50px',
+                        top: '18px',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                    }
+                }]
+            },
+            series: [{
+                type: 'column',
+                name: 'Объем инвестиций',
+                data: years_finance_prepare_data()[1]
+            },  {
+                type: 'spline',
+                name: 'Средний объем инвестиций на 1 объект',
+                data: years_finance_prepare_data()[2],
+                marker: {
+                    lineWidth: 2,
+                    lineColor: Highcharts.getOptions().colors[3],
+                    fillColor: 'white'
+                },
+                yAxis: 1
+            }]
+        });
+    });
+
+</script>
